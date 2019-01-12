@@ -22,14 +22,14 @@ CGLFWWindow::CGLFWWindow(unsigned int nScreenWidth, unsigned int nScreenHeight)
 	m_pWindow = glfwCreateWindow(nScreenWidth, nScreenHeight, "OpenGL Window", NULL, NULL);
 	if (m_pWindow == NULL)
 	{
-		std::cout << "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials." << std::endl;
+		std::cout << "Failed to open GLFW window." << std::endl;
 		glfwTerminate();
 		return;
 	}
 	glfwMakeContextCurrent(m_pWindow); // Initialize GLEW
 	if (!gladLoadGL())
 	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
+		std::cout << "Failed to initialize GLAD." << std::endl;
 		return;
 	}
 

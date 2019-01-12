@@ -16,7 +16,7 @@
 int windowWidth = 800;
 int windowHeight = 600;
 
-std::vector<CModel*> vecpTriangle;
+CModel* pTerrain;
 CShader* pShader;
 CTexture* pTexture;
 CCamera* pCamera;
@@ -27,11 +27,8 @@ void loadContent() //load all objects and fill them
 {
 	srand(time(NULL));
 	//create 100 cubes
-	vecpTriangle.push_back(new CModel(glm::vec3(rand() % 30 - 15, rand() % 30 - 15, rand() % 30 - 15), glm::vec3(rand() % 100 - 50, rand() % 100 - 50, rand() % 100 - 50)));
-	for (int i = 1; i < 100; ++i)
-	{
-		vecpTriangle.push_back(new CModel(vecpTriangle[0], glm::vec3(rand() % 30 - 15, rand() % 30 - 15, rand() % 30 - 15), glm::vec3(rand() % 100 - 50, rand() % 100 - 50, rand() % 100 - 50)));
-	}
+	pTerrain = new CModel();
+	
 	//create camera
 	pCamera = new CCamera(90, 800.0f / 600.0f, 0.1f, 1000.0f, glm::vec3(0, 0, -20), glm::vec3(0, 0, -10), glm::vec3(0, 1, 0));
 	//create shader program
@@ -40,13 +37,6 @@ void loadContent() //load all objects and fill them
 	pTexture = new CTexture("../textures/texture1.bmp");
 	
 	//bind keys to the objects operations
-	for (int i = 0; i < vecpTriangle.size(); ++i)
-	{
-		vecpTriangle[i]->AddKeyBinding(GLFW_KEY_1, std::bind(&CModel::EnableAnimation, vecpTriangle[i]));
-		vecpTriangle[i]->AddKeyBinding(GLFW_KEY_2, std::bind(&CModel::DisableAnimation, vecpTriangle[i]));
-		vecpTriangle[i]->AddKeyBinding(GLFW_KEY_E, std::bind(&CModel::IncreaseAnimationSpeed, vecpTriangle[i]));
-		vecpTriangle[i]->AddKeyBinding(GLFW_KEY_Q, std::bind(&CModel::DecreaseAnimationSpeed, vecpTriangle[i]));
-	}
 	pCamera->AddMouseAxisBinding(CKeyManager::EMouseAxis::XAxis, std::bind(&CCamera::TurnX, pCamera, std::placeholders::_1));
 	pCamera->AddMouseAxisBinding(CKeyManager::EMouseAxis::YAxis, std::bind(&CCamera::TurnY, pCamera, std::placeholders::_1));
 	
@@ -72,12 +62,10 @@ void programLoop(CGLFWWindow* window)
 		bClose = window->IO(); //check key inputs
 		
 		pTexture->Bind(pShader, 0, "texture1");
-		//draw all cubes
-		for (int i = 0; i < vecpTriangle.size(); ++i)
-		{
-			vecpTriangle[i]->draw(pShader, pCamera); //draws the triangle with the given shader
-		}
 
+		//draw terrain	
+		pTerrain->draw(pShader, pCamera); //draws the triangle with the given shader
+	
 		//swaps the backbuffer with the frontbuffer to show the result
 		glfwSwapBuffers(window->getWindowPointer());
 
@@ -92,10 +80,7 @@ void programLoop(CGLFWWindow* window)
 
 void deleteContent() //delete the objects
 {
-	for (int i = 0; i < vecpTriangle.size(); ++i)
-	{
-		delete vecpTriangle[i];
-	}
+	delete pTerrain;
 	delete pShader;
 	delete pTexture;
 	delete pCamera;

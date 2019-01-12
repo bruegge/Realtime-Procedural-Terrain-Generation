@@ -1,32 +1,9 @@
 #include "Model.h"
 
-CModel::CModel(glm::vec3 position, glm::vec3 rotationAxe)
+CModel::CModel()
 {
-	m_vecPosition = position;
-	m_vecRotationAxe = rotationAxe;
 	glGenVertexArrays(1, &m_nVAO);
 	glBindVertexArray(m_nVAO);
-	glGenBuffers(1, &m_nIBO);
-	glGenBuffers(1, &m_nVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_nVBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIBO);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, NULL); //position
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 3)); //textureCoordinates
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 5)); //color
-	glBindVertexArray(0); //unbind
-	CreateCube(); //fills the VBO / IBO with data
-}
-
-CModel::CModel(CModel* pModel, glm::vec3 position, glm::vec3 rotationAxe)
-{
-	m_vecPosition = position;
-	m_vecRotationAxe = rotationAxe;
-	m_nVAO = pModel->m_nVAO;
-	m_nIBO = pModel->m_nIBO;
-	m_nVBO = pModel->m_nVBO;
 	glGenBuffers(1, &m_nIBO);
 	glGenBuffers(1, &m_nVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_nVBO);
@@ -129,41 +106,14 @@ void CModel::draw(CShader* pShader, CCamera* pCamera)
 {
 	pShader->bind();
 	glBindVertexArray(m_nVAO); //bind the VAO including VBO, IBO ...
-	glm::mat4 modelMatrix;
 	GLuint uniformLocationModelMatrix = glGetUniformLocation(pShader->getID(), "modelMatrix");
 	GLuint uniformLocationViewMatrix = glGetUniformLocation(pShader->getID(), "viewMatrix");
 	GLuint uniformLocationProjectionMatrix = glGetUniformLocation(pShader->getID(), "projectionMatrix");
-	if (m_bEnableAnimation)
-	{
-		m_fTime += m_fAnimationSpeed;
-	}
-	modelMatrix = glm::translate(modelMatrix, m_vecPosition);
-	modelMatrix = glm::rotate(modelMatrix, m_fTime, m_vecRotationAxe);
-	
-	glUniformMatrix4fv(uniformLocationModelMatrix, 1, GL_FALSE, &modelMatrix[0][0]);
+
+	glUniformMatrix4fv(uniformLocationModelMatrix, 1, GL_FALSE, &m_mModelMatrix[0][0]);
 	glUniformMatrix4fv(uniformLocationViewMatrix, 1, GL_FALSE, &(pCamera->GetViewMatrix()[0][0]));
 	glUniformMatrix4fv(uniformLocationProjectionMatrix, 1, GL_FALSE, &(pCamera->GetProjectionMatrix()[0][0]));
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 	pShader->unBind();
-}
-
-void CModel::EnableAnimation()
-{
-	m_bEnableAnimation = true;
-}
-
-void CModel::DisableAnimation()
-{
-	m_bEnableAnimation = false;
-}
-
-void CModel::IncreaseAnimationSpeed()
-{
-	m_fAnimationSpeed += 0.0001f;
-}
-
-void CModel::DecreaseAnimationSpeed()
-{
-	m_fAnimationSpeed -= 0.0001f;
 }

@@ -9,16 +9,10 @@
 class CModel : public CKeyManager //inherit the keyManager to let this object act on key strokes
 {
 public:
-	CModel(glm::vec3 position, glm::vec3 rotationAxe); //usual constructor with generating VAO / VBO / IBO
-	CModel(CModel* pModel, glm::vec3 position, glm::vec3 rotationAxe); //constructor without generating a new VAO / VBO / IBO
+	CModel(); //usual constructor with generating VAO / VBO / IBO
 	~CModel();
 
 	void draw(CShader* pShader, CCamera* pCamera); //draw the model with respect to the camera
-
-	void EnableAnimation(); //enables the animation
-	void DisableAnimation(); //disables the animation
-	void IncreaseAnimationSpeed(); //increases the animation speed
-	void DecreaseAnimationSpeed(); //decreases the animation speed
 
 private:
 
@@ -43,12 +37,7 @@ private:
 	GLuint m_nVAO = 0;
 	GLuint m_nVBO = 0;
 	GLuint m_nIBO = 0;
-	float m_fTime = 0.0f; //the time of the animation
-	bool m_bEnableAnimation = false; //the state of the animation (on / off)
-	float m_fAnimationSpeed = 0.001f;
-	glm::vec3 m_vecPosition; //position of the model
-	glm::vec3 m_vecRotationAxe; //axis of rotation
-
+	glm::mat4 m_mModelMatrix;
 	void CreateCube(); //method to fill the VBO / IBO
 };
 
