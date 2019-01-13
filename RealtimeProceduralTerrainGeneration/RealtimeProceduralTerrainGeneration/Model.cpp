@@ -24,16 +24,16 @@ CModel::~CModel()
 	glDeleteVertexArrays(1, &m_nVAO);
 }
 
-void CModel::SetVBOandIBOData(std::vector<SDataVBO> vVBO, std::vector<GLuint> vIBO)
+void CModel::SetVBOandIBOData(std::vector<SDataVBO>* pvVBO, std::vector<GLuint>* pvIBO)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_nVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(SDataVBO) * vVBO.size(), &vVBO[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(SDataVBO) * pvVBO->size(), &pvVBO->front(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * vIBO.size(), &vIBO[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * pvIBO->size(), &pvIBO->front(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	m_nCountIBO = vIBO.size();
+	m_nCountIBO = pvIBO->size();
 }
 
 void CModel::CreateCube()

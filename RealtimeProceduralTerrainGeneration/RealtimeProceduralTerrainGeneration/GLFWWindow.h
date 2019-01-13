@@ -14,7 +14,7 @@ public:
 
 
 private:
-	void checkKey(unsigned int nKey); //helper function for the keyManager
+	void checkKey(unsigned int nKey, double dDeltaTime); //helper function for the keyManager
 	
 	GLFWwindow* m_pWindow = nullptr; //pointer to the GLFW window
 	double m_dXPos = 0; //mouse position

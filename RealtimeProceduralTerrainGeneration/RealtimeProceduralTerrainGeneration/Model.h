@@ -31,7 +31,7 @@ public:
 		GLfloat Color[3];
 	};
 
-	void SetVBOandIBOData(std::vector<SDataVBO> vVBO, std::vector<GLuint> vIBO);
+	void SetVBOandIBOData(std::vector<SDataVBO>* pvVBO, std::vector<GLuint>* pvIBO);
 	void CreateCube(); //method to fill the VBO / IBO
 
 private:

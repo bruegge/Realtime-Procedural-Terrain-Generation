@@ -14,12 +14,12 @@ public:
 		YAxis = 2
 	};
 
-	void AddKeyBinding(unsigned int nKey, std::function<void()> function); //add a keybinding and function to this object
+	void AddKeyBinding(unsigned int nKey, std::function<void(float)> function); //add a keybinding and function to this object
 	void AddMouseAxisBinding(EMouseAxis eAxis, std::function<void(double)> function); //add a mousemove event and function to this object
 	void RemoveKeyBinding(unsigned int nKey); //removes keybindings
 	void RemoveMouseAxisBinding(EMouseAxis eAxis); //removes mousemove event
 
-	static void KeyHasPressed(unsigned int nKey); //this method is called from the CGLFWWindow class everytime a key has been pressed
+	static void KeyHasPressed(unsigned int nKey, double fTimeLeft); //this method is called from the CGLFWWindow class everytime a key has been pressed
 	static void MouseHasMoved(EMouseAxis eAxis, double dDirection); //this method is called from the CGLFWWindow class everytime the mouse has been moved
 
 protected:
@@ -27,7 +27,7 @@ protected:
 	~CKeyManager();
 
 private:
-	std::unordered_map<unsigned int, std::function<void()>> m_umKeyBindings; //a list of all keybinding for this object
+	std::unordered_map<unsigned int, std::function<void(double)>> m_umKeyBindings; //a list of all keybinding for this object
 	std::unordered_map<EMouseAxis, std::function<void(double)>> m_umMouseAxisBindings; //a list of all mousemove bindings for this object
 
 };

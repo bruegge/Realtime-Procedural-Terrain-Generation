@@ -13,9 +13,9 @@ CKeyManager::~CKeyManager()
 	setGlobalObjects.erase(this);
 }
 
-void CKeyManager::AddKeyBinding(unsigned int nKey, std::function<void()> function)
+void CKeyManager::AddKeyBinding(unsigned int nKey, std::function<void(float)> function)
 {
-	std::pair<unsigned int, std::function<void()>> values;
+	std::pair<unsigned int, std::function<void(float)>> values;
 	values.first = nKey;
 	values.second = function;
 	m_umKeyBindings.insert(values);
@@ -39,14 +39,14 @@ void CKeyManager::RemoveMouseAxisBinding(EMouseAxis eAxis)
 	m_umMouseAxisBindings.erase(eAxis);
 }
 
-void CKeyManager::KeyHasPressed(unsigned int nKey)
+void CKeyManager::KeyHasPressed(unsigned int nKey, double fTimeLeft)
 {
 	for (std::set<CKeyManager*>::iterator keyManagerIT = setGlobalObjects.begin(); keyManagerIT != setGlobalObjects.end(); ++keyManagerIT)
 	{
-		std::unordered_map<unsigned int, std::function<void()>>::iterator keyBindingIT = (*keyManagerIT)->m_umKeyBindings.find(nKey);
+		std::unordered_map<unsigned int, std::function<void(double)>>::iterator keyBindingIT = (*keyManagerIT)->m_umKeyBindings.find(nKey);
 		if(keyBindingIT != (*keyManagerIT)->m_umKeyBindings.end()) //this object has bound this key!
 		{ 
-			keyBindingIT->second();
+			keyBindingIT->second(fTimeLeft);
 		}
 	}
 }

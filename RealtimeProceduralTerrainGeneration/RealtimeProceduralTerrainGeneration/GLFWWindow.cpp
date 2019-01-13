@@ -1,8 +1,11 @@
 #include "GLFWWindow.h"
 #include <iostream>
 #include <unordered_map>
+#include <chrono>
 #include "Model.h"
 #include "KeyManager.h"
+
+std::chrono::time_point<std::chrono::steady_clock> tpLastTime;
 
 CGLFWWindow::CGLFWWindow(unsigned int nScreenWidth, unsigned int nScreenHeight)
 {
@@ -56,6 +59,12 @@ bool CGLFWWindow::IO()
 {
 	glfwPollEvents();
 
+	std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
+	
+	std::chrono::duration<double> diff = end - tpLastTime;
+	tpLastTime = end;
+	double dTimeDiff = diff.count();
+
 	if(glfwGetKey(m_pWindow, GLFW_KEY_1) == GLFW_PRESS)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -68,7 +77,7 @@ bool CGLFWWindow::IO()
 
 	for (int i = 0; i < 400; ++i) // check all keys if they're pressed
 	{
-		checkKey(i);
+		checkKey(i, dTimeDiff);
 	}
 	
 	double xPos, yPos;
@@ -92,10 +101,10 @@ bool CGLFWWindow::IO()
 	return glfwGetKey(m_pWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwWindowShouldClose(m_pWindow); //stop program when closing the window or pressing "escape"
 }
 
-void CGLFWWindow::checkKey(unsigned int nKey)
+void CGLFWWindow::checkKey(unsigned int nKey, double dDeltaTime)
 {
 	if (glfwGetKey(m_pWindow, nKey) == GLFW_PRESS)
 	{
-		CKeyManager::KeyHasPressed(nKey);
+		CKeyManager::KeyHasPressed(nKey, dDeltaTime);
 	}
 }

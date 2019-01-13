@@ -98,12 +98,12 @@ void CCamera::TurnY(double dDeltaY)
 	m_ViewMatrix = glm::lookAt(position, glm::vec3(0, 0, 0), up);
 }
 
-void CCamera::Forward()
+void CCamera::Forward(double dDeltaTime)
 {
-	Translate(glm::vec3(0, 0, 0.01f));
+	Translate(glm::vec3(0, 0, 4.0f * dDeltaTime));
 }
 
-void CCamera::Backward()
+void CCamera::Backward(double dDeltaTime)
 {
-	Translate(glm::vec3(0, 0, -0.01f));
+	Translate(glm::vec3(0, 0, -4.0f * dDeltaTime));
 }

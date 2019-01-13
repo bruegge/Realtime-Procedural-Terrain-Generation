@@ -18,8 +18,8 @@ public:
 	void Translate(glm::vec3 Translation);
 	void TurnX(double deltaX);
 	void TurnY(double deltaY);
-	void Forward();
-	void Backward();
+	void Forward(double dDeltaTime);
+	void Backward(double dDeltaTime);
 	glm::vec3 GetPosition() const;
 
 private:

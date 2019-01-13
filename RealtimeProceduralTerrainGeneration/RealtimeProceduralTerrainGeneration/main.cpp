@@ -29,10 +29,10 @@ void loadContent() //load all objects and fill them
 	srand(time(NULL));
 	//create 100 cubes
 	pTerrain = new CModel();
-	pTerrainGenerator = new CTerrainGenerator(1024, 1024);
+	pTerrainGenerator = new CTerrainGenerator(512, 512);
 	std::pair<std::vector<CModel::SDataVBO>, std::vector<GLuint>> meshData = pTerrainGenerator->GenerateMeshData();
 
-	pTerrain->SetVBOandIBOData((meshData.first), (meshData.second));
+	pTerrain->SetVBOandIBOData(&(meshData.first), &(meshData.second));
 	//pTerrain->CreateCube();
 	//create camera
 	pCamera = new CCamera(90, 800.0f / 600.0f, 0.1f, 1000.0f, glm::vec3(0, 0, -20), glm::vec3(0, 0, -10), glm::vec3(0, 1, 0));
@@ -45,8 +45,8 @@ void loadContent() //load all objects and fill them
 	pCamera->AddMouseAxisBinding(CKeyManager::EMouseAxis::XAxis, std::bind(&CCamera::TurnX, pCamera, std::placeholders::_1));
 	pCamera->AddMouseAxisBinding(CKeyManager::EMouseAxis::YAxis, std::bind(&CCamera::TurnY, pCamera, std::placeholders::_1));
 	
-	pCamera->AddKeyBinding(GLFW_KEY_W, std::bind(&CCamera::Forward, pCamera));
-	pCamera->AddKeyBinding(GLFW_KEY_S, std::bind(&CCamera::Backward, pCamera));
+	pCamera->AddKeyBinding(GLFW_KEY_W, std::bind(&CCamera::Forward, pCamera, std::placeholders::_1));
+	pCamera->AddKeyBinding(GLFW_KEY_S, std::bind(&CCamera::Backward, pCamera, std::placeholders::_1));
 	
 	std::cout << "Content loaded" << std::endl;
 }

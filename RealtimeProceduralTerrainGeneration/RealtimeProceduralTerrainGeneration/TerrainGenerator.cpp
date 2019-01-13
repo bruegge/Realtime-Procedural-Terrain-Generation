@@ -19,8 +19,8 @@ std::pair<std::vector<CModel::SDataVBO>, std::vector<GLuint>> CTerrainGenerator:
 		for (unsigned int y = 0; y < m_nHeight; ++y)
 		{
 			CModel::SDataVBO sVertex;
-			GLfloat fXPosition = static_cast<GLfloat>(x) / static_cast<GLfloat>(m_nWidth);
-			GLfloat fYPosition = static_cast<GLfloat>(y) / static_cast<GLfloat>(m_nHeight);
+			GLfloat fXPosition = static_cast<GLfloat>(x) / static_cast<GLfloat>(m_nWidth - 1);
+			GLfloat fYPosition = static_cast<GLfloat>(y) / static_cast<GLfloat>(m_nHeight - 1);
 
 			sVertex.SetData((fXPosition-0.5f)*10.0f, (fYPosition-0.5f)*10.0f, 0, fXPosition, fYPosition, 0, 0, 0);
 			resultVBO[m_nHeight * x + y] = sVertex;
