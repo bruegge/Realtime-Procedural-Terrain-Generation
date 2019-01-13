@@ -12,6 +12,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Camera.h"
+#include "TerrainGenerator.h"
 
 int windowWidth = 800;
 int windowHeight = 600;
@@ -20,7 +21,7 @@ CModel* pTerrain;
 CShader* pShader;
 CTexture* pTexture;
 CCamera* pCamera;
-
+CTerrainGenerator* pTerrainGenerator;
 CGLFWWindow* pWindow;
 
 void loadContent() //load all objects and fill them
@@ -28,7 +29,11 @@ void loadContent() //load all objects and fill them
 	srand(time(NULL));
 	//create 100 cubes
 	pTerrain = new CModel();
-	
+	pTerrainGenerator = new CTerrainGenerator(1024, 1024);
+	std::pair<std::vector<CModel::SDataVBO>, std::vector<GLuint>> meshData = pTerrainGenerator->GenerateMeshData();
+
+	pTerrain->SetVBOandIBOData((meshData.first), (meshData.second));
+	//pTerrain->CreateCube();
 	//create camera
 	pCamera = new CCamera(90, 800.0f / 600.0f, 0.1f, 1000.0f, glm::vec3(0, 0, -20), glm::vec3(0, 0, -10), glm::vec3(0, 1, 0));
 	//create shader program

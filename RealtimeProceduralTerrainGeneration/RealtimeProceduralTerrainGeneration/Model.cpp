@@ -15,7 +15,6 @@ CModel::CModel()
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 5)); //color
 	glBindVertexArray(0); //unbind
-	CreateCube(); //fills the VBO / IBO with data
 }
 
 CModel::~CModel()
@@ -23,6 +22,18 @@ CModel::~CModel()
 	glDeleteBuffers(1, &m_nVBO);
 	glDeleteBuffers(1, &m_nIBO);
 	glDeleteVertexArrays(1, &m_nVAO);
+}
+
+void CModel::SetVBOandIBOData(std::vector<SDataVBO> vVBO, std::vector<GLuint> vIBO)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_nVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(SDataVBO) * vVBO.size(), &vVBO[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * vIBO.size(), &vIBO[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	m_nCountIBO = vIBO.size();
 }
 
 void CModel::CreateCube()
@@ -98,7 +109,7 @@ void CModel::CreateCube()
 
 	//write data to IBO
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_nIBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(iboData), iboData, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * 36, iboData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -113,7 +124,7 @@ void CModel::draw(CShader* pShader, CCamera* pCamera)
 	glUniformMatrix4fv(uniformLocationModelMatrix, 1, GL_FALSE, &m_mModelMatrix[0][0]);
 	glUniformMatrix4fv(uniformLocationViewMatrix, 1, GL_FALSE, &(pCamera->GetViewMatrix()[0][0]));
 	glUniformMatrix4fv(uniformLocationProjectionMatrix, 1, GL_FALSE, &(pCamera->GetProjectionMatrix()[0][0]));
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_nCountIBO, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 	pShader->unBind();
 }

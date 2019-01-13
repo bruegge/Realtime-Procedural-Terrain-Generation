@@ -13,9 +13,6 @@ public:
 	~CModel();
 
 	void draw(CShader* pShader, CCamera* pCamera); //draw the model with respect to the camera
-
-private:
-
 	struct SDataVBO //structure of a single vertex
 	{
 		void SetData(GLfloat fPositionX, GLfloat fPositionY, GLfloat fPositionZ, GLfloat fTextureU, GLfloat fTextureV, GLfloat fColorR, GLfloat fColorG, GLfloat fColorB)
@@ -34,10 +31,15 @@ private:
 		GLfloat Color[3];
 	};
 
+	void SetVBOandIBOData(std::vector<SDataVBO> vVBO, std::vector<GLuint> vIBO);
+	void CreateCube(); //method to fill the VBO / IBO
+
+private:
+
+	GLuint m_nCountIBO = 0;
 	GLuint m_nVAO = 0;
 	GLuint m_nVBO = 0;
 	GLuint m_nIBO = 0;
 	glm::mat4 m_mModelMatrix;
-	void CreateCube(); //method to fill the VBO / IBO
 };
 

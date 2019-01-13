@@ -2,7 +2,7 @@
 in vec4 vertexColor;
 in vec2 vertexTextureCoordinates;
 uniform sampler2D texture1;
-uniform int displayTexture = 0;
+uniform int displayTexture = 1;
 out vec4 color;
 
 void main()
@@ -13,6 +13,6 @@ void main()
 	}
 	else
 	{
-		color = vertexColor;
+		color = vec4(1,0,1,1);
 	}
 }
