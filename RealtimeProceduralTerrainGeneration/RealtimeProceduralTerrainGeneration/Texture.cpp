@@ -21,6 +21,10 @@ CTexture::~CTexture()
 
 void CTexture::LoadTexture(const char* pTexturePath)
 {
+	if (m_nID)
+	{
+		glDeleteTextures(1, &m_nID);
+	}
 	glGenTextures(1, &m_nID);
 	glBindTexture(GL_TEXTURE_2D, m_nID); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 	glEnable(GL_TEXTURE_2D);
@@ -46,7 +50,7 @@ void CTexture::LoadTexture(const char* pTexturePath)
 	glBindTexture(GL_TEXTURE_2D, 0); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 }
 
-void CTexture::SetTextureData(unsigned int nWidth, unsigned int nHeight, std::vector<GLubyte>* data)
+void CTexture::SetTextureData(unsigned int nWidth, unsigned int nHeight, std::vector<GLfloat>* data)
 {
 	if (m_nID)
 	{
@@ -56,7 +60,7 @@ void CTexture::SetTextureData(unsigned int nWidth, unsigned int nHeight, std::ve
 	glBindTexture(GL_TEXTURE_2D, m_nID); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 	glEnable(GL_TEXTURE_2D);
 	// set the texture wrapping parameters
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nWidth, nHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, &data->front());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, nWidth, nHeight, 0, GL_RED, GL_FLOAT, &data->front());
 	glGenerateMipmap(GL_TEXTURE_2D);
 	
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)

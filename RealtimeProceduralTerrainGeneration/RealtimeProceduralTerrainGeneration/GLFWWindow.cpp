@@ -9,7 +9,6 @@ std::chrono::time_point<std::chrono::steady_clock> tpLastTime;
 
 CGLFWWindow::CGLFWWindow(unsigned int nScreenWidth, unsigned int nScreenHeight)
 {
-
 	if (!glfwInit())
 	{
 		std::cout << "Failed to initialize GLFW" << std::endl;
@@ -21,7 +20,7 @@ CGLFWWindow::CGLFWWindow(unsigned int nScreenWidth, unsigned int nScreenHeight)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL 
 
-																   // Open a window and create its OpenGL context
+	// Open a window and create its OpenGL context
 	m_pWindow = glfwCreateWindow(nScreenWidth, nScreenHeight, "OpenGL Window", NULL, NULL);
 	if (m_pWindow == NULL)
 	{
@@ -40,10 +39,6 @@ CGLFWWindow::CGLFWWindow(unsigned int nScreenWidth, unsigned int nScreenHeight)
 	glfwSetInputMode(m_pWindow, GLFW_STICKY_KEYS, GL_TRUE);
 
 	std::cout << "Window creation successful" << std::endl;
-
-	GLuint VertexArrayID;
-	//glGenVertexArrays(1, &VertexArrayID);
-	//glBindVertexArray(VertexArrayID);
 }
 
 CGLFWWindow::~CGLFWWindow()
@@ -74,6 +69,8 @@ bool CGLFWWindow::IO()
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+
+
 
 	for (int i = 0; i < 400; ++i) // check all keys if they're pressed
 	{

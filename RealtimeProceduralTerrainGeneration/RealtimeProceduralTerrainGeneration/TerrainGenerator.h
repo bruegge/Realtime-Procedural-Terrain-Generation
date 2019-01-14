@@ -11,7 +11,7 @@ public:
 	
 	unsigned int GetWidth();
 	unsigned int GetHeight();
-	std::vector<GLubyte>* GetDataSet();
+	std::vector<GLfloat>* GetDataSet();
 	void GenerateVoronoi(unsigned int nCount);
 	void GenerateErosion(unsigned int nSteps);
 	void GenerateNoise();
@@ -20,6 +20,6 @@ public:
 private:
 	unsigned int m_nWidth;
 	unsigned int m_nHeight;
-	std::vector<GLubyte> m_vecDataSet;
+	std::vector<GLfloat> m_vecDataSet;
 };
 

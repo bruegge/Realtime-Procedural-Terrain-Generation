@@ -43,7 +43,9 @@ void loadContent() //load all objects and fill them
 	//create shader program
 	pShader = CShader::createShaderProgram("../shaders/vertex.glsl", nullptr, nullptr, "../shaders/geometry.glsl", "../shaders/fragment.glsl");
 	//create and load texture
-	pTextureTerrain = new CTexture("../textures/testTerrain.bmp");
+	//pTextureTerrain = new CTexture("../textures/testTerrain.bmp");
+	pTextureTerrain = new CTexture();
+	pTerrainGenerator->GenerateNoise();
 	pTextureCliff = new CTexture("../textures/cliff.bmp");
 	pTextureGrass = new CTexture("../textures/grass.bmp");
 	pTextureMud = new CTexture("../textures/mud.bmp");
@@ -74,6 +76,16 @@ void programLoop(CGLFWWindow* window)
 
 		bClose = window->IO(); //check key inputs
 		
+		//check to change terrain
+		if (glfwGetKey(window->getWindowPointer(), GLFW_KEY_3) == GLFW_PRESS)
+		{
+			std::vector<GLfloat>* pTerrainData = pTerrainGenerator->GetDataSet();
+			pTextureTerrain->SetTextureData(224, 224, pTerrainData);
+		}
+		if (glfwGetKey(window->getWindowPointer(), GLFW_KEY_4) == GLFW_PRESS)
+		{
+			pTextureTerrain->LoadTexture("../textures/testTerrain.bmp");
+		}
 		pShader->bind();
 		pTextureTerrain->Link(pShader, 0, "texture1");
 		pTextureCliff->Link(pShader, 1, "textureCliff");

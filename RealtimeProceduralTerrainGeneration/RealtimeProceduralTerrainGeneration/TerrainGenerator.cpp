@@ -48,7 +48,7 @@ std::pair<std::vector<CModel::SDataVBO>, std::vector<GLuint>> CTerrainGenerator:
 	return resultTotal;
 }
 
-std::vector<GLubyte>* CTerrainGenerator::GetDataSet()
+std::vector<GLfloat>* CTerrainGenerator::GetDataSet()
 {
 	return &m_vecDataSet;
 }
@@ -62,7 +62,15 @@ void CTerrainGenerator::GenerateErosion(unsigned int nSteps)
 }
 void CTerrainGenerator::GenerateNoise()
 {
-
+	m_vecDataSet.resize(m_nHeight*m_nWidth * 3);
+	for (unsigned int x = 0; x < m_nWidth; ++x)
+	{
+		for (unsigned int y = 0; y < m_nHeight; ++y)
+		{
+			float fHeight =0.5f+ sin(static_cast<float>(x*5) / static_cast<float>(m_nWidth) * 2 * 3.1415926) / 4 + cos(static_cast<float>(y*5) / static_cast<float>(m_nHeight) * 2 * 3.1415926) / 4;
+			m_vecDataSet[(x*m_nHeight + y)] = fHeight;
+		}
+	}
 }
 
 unsigned int CTerrainGenerator::GetWidth()
