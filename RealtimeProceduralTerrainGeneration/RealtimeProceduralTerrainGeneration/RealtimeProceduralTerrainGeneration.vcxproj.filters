@@ -19,6 +19,9 @@
     <Filter Include="Resource Files\Textures">
       <UniqueIdentifier>{3a89616e-b5b5-4a17-b78a-6a588e05599d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Doc">
+      <UniqueIdentifier>{9889e6f9-2a8b-4200-9ece-d47314ec5fe3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -88,6 +91,9 @@
     <None Include="ClassDiagram.cd" />
     <None Include="..\Shaders\geometry.glsl">
       <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\Doc\paper procedural terrain generation.pdf">
+      <Filter>Resource Files\Doc</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

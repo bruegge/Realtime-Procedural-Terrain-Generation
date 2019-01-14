@@ -15,11 +15,10 @@ in GS_OUT
 	vec3 vertexPosition;
 } fs_in;  
 
-vec3 BiLinearInterpolation(vec3 color00, vec3 color01, vec3 color10, vec3 color11, vec2 interpolatedValue)
+vec3 LinearInterpolation(vec3 color0, vec3 color1, float interpolatedValue, float minValue, float maxValue)
 {
-	vec3 colorX0 = color00 * (1.0f - interpolatedValue.x) + color01 * interpolatedValue.x;
-	vec3 colorX1 = color10 * (1.0f - interpolatedValue.x) + color11 * interpolatedValue.x;
-	vec3 result = colorX0 * (1.0f - interpolatedValue.y) + colorX1 * interpolatedValue.y;
+	float interpVal = (interpolatedValue-minValue)/(maxValue - minValue);
+	vec3 result = color0 * (1.0f - interpVal) + color1 * interpVal;
 	return result;
 }
 
@@ -42,17 +41,21 @@ void main()
 
 		vec3 colorValue = vec3(0,0,0);
 		
-		if(fs_in.vertexPosition.z < 0.25)
+		float border1 = 0.25f;
+		float border2 = 0.5f;
+		float border3 = 0.75f;
+		
+		if(fs_in.vertexPosition.z < border1)
 		{
-			colorValue = Grass;
+			colorValue = LinearInterpolation(Grass,Mud,fs_in.vertexPosition.z, 0.0f, border1);
 		}
-		else if(fs_in.vertexPosition.z < 0.5)
+		else if(fs_in.vertexPosition.z < border2)
 		{
-			colorValue = Mud;
+			colorValue = LinearInterpolation(Mud, Cliff,fs_in.vertexPosition.z, border1, border2);
 		}
-		else if(fs_in.vertexPosition.z < 0.75)
+		else if(fs_in.vertexPosition.z < border3)
 		{
-			colorValue = Cliff;
+			colorValue = LinearInterpolation(Cliff, Snow,fs_in.vertexPosition.z, border2, border3);
 		}
 		else
 		{

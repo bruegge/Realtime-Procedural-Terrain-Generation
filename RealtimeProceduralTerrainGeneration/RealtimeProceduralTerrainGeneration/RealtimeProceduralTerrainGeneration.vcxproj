@@ -140,6 +140,7 @@
     <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Doc\paper procedural terrain generation.pdf" />
     <None Include="..\Shaders\fragment.glsl" />
     <None Include="..\Shaders\geometry.glsl" />
     <None Include="..\Shaders\vertex.glsl" />

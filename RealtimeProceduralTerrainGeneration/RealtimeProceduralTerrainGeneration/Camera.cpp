@@ -74,15 +74,6 @@ glm::vec3 CCamera::GetPosition() const
 
 void CCamera::TurnX(double dDeltaX)
 {
-	/*glm::mat4 transposed = glm::transpose(m_ViewMatrix);
-	glm::vec3 left = transposed[0];
-	glm::vec3 up = transposed[1];
-	glm::vec3 front = transposed[2];
-	glm::vec3 position = GetPosition();
-	float fDistanceToCenter = sqrt(position.x*position.x + position.y*position.y + position.z*position.z);
-	position += left * static_cast<float>(dDeltaX) * fDistanceToCenter * 0.01f;
-	position = glm::normalize(position)* fDistanceToCenter;
-	m_ViewMatrix = glm::lookAt(position, glm::vec3(0,0,0), up);*/
 	glm::mat4 rotationMatrix = glm::rotate(static_cast<float>(-dDeltaX/180.0f), glm::vec3(0, 0, 1));
 	m_ViewMatrix = m_ViewMatrix * rotationMatrix;
 }
