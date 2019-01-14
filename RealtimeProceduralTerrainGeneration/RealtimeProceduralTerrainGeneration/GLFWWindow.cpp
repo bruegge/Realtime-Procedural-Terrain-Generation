@@ -15,7 +15,7 @@ CGLFWWindow::CGLFWWindow(unsigned int nScreenWidth, unsigned int nScreenHeight)
 		std::cout << "Failed to initialize GLFW" << std::endl;
 		return;
 	}
-	glfwWindowHint(GLFW_SAMPLES, 0); // 0x antialiasing
+	glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // We want OpenGL 4.3
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed

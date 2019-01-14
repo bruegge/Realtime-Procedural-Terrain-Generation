@@ -33,7 +33,7 @@ void main()
 	else
 	{
 		float textureScale = 100.0f;
-		float mipmapLevel = textureQueryLod(textureGrass, fs_in.vertexTextureCoordinates*textureScale).x/20.0f;
+		float mipmapLevel = textureQueryLod(textureGrass, fs_in.vertexTextureCoordinates*textureScale).x/40.0f;
     
 		vec3 Grass = texture(textureGrass, fs_in.vertexTextureCoordinates*textureScale,mipmapLevel).xyz;
 		vec3 Snow = texture(textureSnow, fs_in.vertexTextureCoordinates*textureScale,mipmapLevel).xyz;
