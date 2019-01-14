@@ -74,7 +74,7 @@ glm::vec3 CCamera::GetPosition() const
 
 void CCamera::TurnX(double dDeltaX)
 {
-	glm::mat4 transposed = glm::transpose(m_ViewMatrix);
+	/*glm::mat4 transposed = glm::transpose(m_ViewMatrix);
 	glm::vec3 left = transposed[0];
 	glm::vec3 up = transposed[1];
 	glm::vec3 front = transposed[2];
@@ -82,7 +82,9 @@ void CCamera::TurnX(double dDeltaX)
 	float fDistanceToCenter = sqrt(position.x*position.x + position.y*position.y + position.z*position.z);
 	position += left * static_cast<float>(dDeltaX) * fDistanceToCenter * 0.01f;
 	position = glm::normalize(position)* fDistanceToCenter;
-	m_ViewMatrix = glm::lookAt(position, glm::vec3(0,0,0), up);
+	m_ViewMatrix = glm::lookAt(position, glm::vec3(0,0,0), up);*/
+	glm::mat4 rotationMatrix = glm::rotate(static_cast<float>(-dDeltaX/180.0f), glm::vec3(0, 0, 1));
+	m_ViewMatrix = m_ViewMatrix * rotationMatrix;
 }
 
 void CCamera::TurnY(double dDeltaY)
@@ -95,15 +97,28 @@ void CCamera::TurnY(double dDeltaY)
 	float fDistanceToCenter = sqrt(position.x*position.x + position.y*position.y + position.z*position.z);
 	position -= up * static_cast<float>(dDeltaY) * fDistanceToCenter * 0.01f;
 	position = glm::normalize(position)* fDistanceToCenter;
-	m_ViewMatrix = glm::lookAt(position, glm::vec3(0, 0, 0), up);
+	if (position.z > 0.0f && (up.z > 0.0f || dDeltaY > 0))
+	{
+		m_ViewMatrix = glm::lookAt(position, glm::vec3(0, 0, 0), up);
+	}
 }
 
 void CCamera::Forward(double dDeltaTime)
 {
-	Translate(glm::vec3(0, 0, 4.0f * dDeltaTime));
+	glm::vec3 position = GetPosition();
+	float fDistanceToCenter = sqrt(position.x*position.x + position.y*position.y + position.z*position.z);
+	if (fDistanceToCenter > 1.0f)
+	{
+		Translate(glm::vec3(0, 0, 4.0f * dDeltaTime));
+	}
 }
 
 void CCamera::Backward(double dDeltaTime)
 {
-	Translate(glm::vec3(0, 0, -4.0f * dDeltaTime));
+	glm::vec3 position = GetPosition();
+	float fDistanceToCenter = sqrt(position.x*position.x + position.y*position.y + position.z*position.z);
+	if (fDistanceToCenter < 10.0f)
+	{
+		Translate(glm::vec3(0, 0, -4.0f * dDeltaTime));
+	}
 }
