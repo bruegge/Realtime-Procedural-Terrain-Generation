@@ -141,7 +141,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shaders\fragment.glsl" />
+    <None Include="..\Shaders\geometry.glsl" />
     <None Include="..\Shaders\vertex.glsl" />
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Textures\cliff.bmp" />
+    <Image Include="..\Textures\grass.bmp" />
+    <Image Include="..\Textures\mud.bmp" />
+    <Image Include="..\Textures\snow.bmp" />
+    <Image Include="..\Textures\testTerrain.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

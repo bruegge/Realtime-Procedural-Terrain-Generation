@@ -27,24 +27,42 @@ std::pair<std::vector<CModel::SDataVBO>, std::vector<GLuint>> CTerrainGenerator:
 		}
 	}
 	
-	std::vector<unsigned int> resultIBO;
+	std::vector<unsigned int> resultIBO((m_nWidth-1) * (m_nHeight - 1)*6);
+	unsigned int nVectorPosition = 0;
 	for (unsigned int x = 0; x < m_nWidth-1; ++x)
 	{
 		for (unsigned int y = 0; y < m_nHeight-1; ++y)
 		{
-			resultIBO.push_back(x * m_nHeight + y);
-			resultIBO.push_back(x * m_nHeight + y + 1);
-			resultIBO.push_back((x + 1) * m_nHeight + y);
+			resultIBO[nVectorPosition++] = x * m_nHeight + y;
+			resultIBO[nVectorPosition++] = x * m_nHeight + y + 1;
+			resultIBO[nVectorPosition++] = (x + 1) * m_nHeight + y;
 
-			resultIBO.push_back(x * m_nHeight + y + 1);
-			resultIBO.push_back((x + 1) * m_nHeight + y + 1);
-			resultIBO.push_back((x + 1) * m_nHeight + y);
+			resultIBO[nVectorPosition++] = x * m_nHeight + y + 1;
+			resultIBO[nVectorPosition++] = (x + 1) * m_nHeight + y + 1;
+			resultIBO[nVectorPosition++] = (x + 1) * m_nHeight + y;
 		}
 	}
 	std::pair<std::vector<CModel::SDataVBO>, std::vector<unsigned int>> resultTotal;
 	resultTotal.first = resultVBO;
 	resultTotal.second = resultIBO;
 	return resultTotal;
+}
+
+std::vector<GLubyte>* CTerrainGenerator::GetDataSet()
+{
+	return &m_vecDataSet;
+}
+void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
+{
+
+}
+void CTerrainGenerator::GenerateErosion(unsigned int nSteps)
+{
+
+}
+void CTerrainGenerator::GenerateNoise()
+{
+
 }
 
 unsigned int CTerrainGenerator::GetWidth()

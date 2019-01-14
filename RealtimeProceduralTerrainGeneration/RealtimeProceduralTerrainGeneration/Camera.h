@@ -5,7 +5,7 @@
 class CCamera : public CKeyManager // camera should act on key input
 {
 public:
-	CCamera(float fFieldOfView, float fNearClippingplane, float fFarClippingPlane, float fAspectRatio, glm::vec3 EyePosition, glm::vec3 LookAtVector, glm::vec3 UpVector);
+	CCamera(float fFieldOfView, float fAspectRatio, float fNearClippingplane, float fFarClippingPlane, glm::vec3 EyePosition, glm::vec3 LookAtVector, glm::vec3 UpVector);
 	~CCamera();
 
 	glm::mat4 GetViewMatrix() const;

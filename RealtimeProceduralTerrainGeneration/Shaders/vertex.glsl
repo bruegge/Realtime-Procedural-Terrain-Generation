@@ -9,14 +9,15 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform sampler2D texture1;
 
-out vec4 vertexColor;
-out vec2 vertexTextureCoordinates;
+out VS_OUT 
+{
+    vec2 vertexTextureCoordinates;
+} vs_out;
 
 void main()
 {
-	vec4 texturePosition = texture(texture1, textureCoordinate.xy);
-	vec4 positionHeight = vec4(position.xy, texturePosition.x,1);
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * positionHeight;
-	vertexColor = vec4(color, 1.0f);
-	vertexTextureCoordinates = textureCoordinate;
+	vec4 textureDepth = texture(texture1, textureCoordinate.xy);
+	vec4 positionHeight = vec4(position.xy, textureDepth.x,1);
+	gl_Position = positionHeight;
+	vs_out.vertexTextureCoordinates = textureCoordinate;
 }

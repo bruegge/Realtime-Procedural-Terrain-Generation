@@ -29,6 +29,4 @@ protected:
 private:
 	std::unordered_map<unsigned int, std::function<void(double)>> m_umKeyBindings; //a list of all keybinding for this object
 	std::unordered_map<EMouseAxis, std::function<void(double)>> m_umMouseAxisBindings; //a list of all mousemove bindings for this object
-
 };
-

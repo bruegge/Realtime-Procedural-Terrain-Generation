@@ -19,7 +19,12 @@ int windowHeight = 600;
 
 CModel* pTerrain;
 CShader* pShader;
-CTexture* pTexture;
+CTexture* pTextureTerrain;
+CTexture* pTextureGrass;
+CTexture* pTextureSnow;
+CTexture* pTextureCliff;
+CTexture* pTextureMud;
+
 CCamera* pCamera;
 CTerrainGenerator* pTerrainGenerator;
 CGLFWWindow* pWindow;
@@ -29,18 +34,21 @@ void loadContent() //load all objects and fill them
 	srand(time(NULL));
 	//create 100 cubes
 	pTerrain = new CModel();
-	pTerrainGenerator = new CTerrainGenerator(512, 512);
+	pTerrainGenerator = new CTerrainGenerator(224, 224);
 	std::pair<std::vector<CModel::SDataVBO>, std::vector<GLuint>> meshData = pTerrainGenerator->GenerateMeshData();
 
 	pTerrain->SetVBOandIBOData(&(meshData.first), &(meshData.second));
-	//pTerrain->CreateCube();
 	//create camera
-	pCamera = new CCamera(90, 800.0f / 600.0f, 0.1f, 1000.0f, glm::vec3(0, 0, -20), glm::vec3(0, 0, -10), glm::vec3(0, 1, 0));
+	pCamera = new CCamera(90, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 1000.0f, glm::vec3(0, 0, 7), glm::vec3(0, 0, -10), glm::vec3(0, 1, 0));
 	//create shader program
-	pShader = CShader::createShaderProgram("../shaders/vertex.glsl", nullptr, nullptr, nullptr, "../shaders/fragment.glsl");
+	pShader = CShader::createShaderProgram("../shaders/vertex.glsl", nullptr, nullptr, "../shaders/geometry.glsl", "../shaders/fragment.glsl");
 	//create and load texture
-	pTexture = new CTexture("../textures/texture1.bmp");
-	
+	pTextureTerrain = new CTexture("../textures/testTerrain.bmp");
+	pTextureCliff = new CTexture("../textures/cliff.bmp");
+	pTextureGrass = new CTexture("../textures/grass.bmp");
+	pTextureMud = new CTexture("../textures/mud.bmp");
+	pTextureSnow = new CTexture("../textures/snow.bmp");
+
 	//bind keys to the objects operations
 	pCamera->AddMouseAxisBinding(CKeyManager::EMouseAxis::XAxis, std::bind(&CCamera::TurnX, pCamera, std::placeholders::_1));
 	pCamera->AddMouseAxisBinding(CKeyManager::EMouseAxis::YAxis, std::bind(&CCamera::TurnY, pCamera, std::placeholders::_1));
@@ -66,7 +74,18 @@ void programLoop(CGLFWWindow* window)
 
 		bClose = window->IO(); //check key inputs
 		
-		pTexture->Bind(pShader, 0, "texture1");
+		pShader->bind();
+		pTextureTerrain->Link(pShader, 0, "texture1");
+		pTextureCliff->Link(pShader, 1, "textureCliff");
+		pTextureGrass->Link(pShader, 2, "textureGrass");
+		pTextureMud->Link(pShader, 3, "textureMud");
+		pTextureSnow->Link(pShader, 4, "textureSnow");
+
+		pTextureTerrain->Bind(0);
+		pTextureCliff->Bind(1);
+		pTextureGrass->Bind(2);
+		pTextureMud->Bind(3);
+		pTextureSnow->Bind(4);
 
 		//draw terrain	
 		pTerrain->draw(pShader, pCamera); //draws the triangle with the given shader
@@ -86,8 +105,13 @@ void programLoop(CGLFWWindow* window)
 void deleteContent() //delete the objects
 {
 	delete pTerrain;
+	delete pTerrainGenerator;
 	delete pShader;
-	delete pTexture;
+	delete pTextureTerrain;
+	delete pTextureCliff;
+	delete pTextureGrass;
+	delete pTextureMud;
+	delete pTextureSnow;
 	delete pCamera;
 }
 
