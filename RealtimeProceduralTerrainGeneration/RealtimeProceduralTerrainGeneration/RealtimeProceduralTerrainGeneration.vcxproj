@@ -143,6 +143,8 @@
     <None Include="..\..\Doc\paper procedural terrain generation.pdf" />
     <None Include="..\Shaders\fragment.glsl" />
     <None Include="..\Shaders\geometry.glsl" />
+    <None Include="..\Shaders\tessellationControl.glsl" />
+    <None Include="..\Shaders\tessellationEvaluation.glsl" />
     <None Include="..\Shaders\vertex.glsl" />
     <None Include="ClassDiagram.cd" />
   </ItemGroup>

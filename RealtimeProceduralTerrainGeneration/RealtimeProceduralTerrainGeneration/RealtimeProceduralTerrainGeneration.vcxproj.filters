@@ -95,6 +95,12 @@
     <None Include="..\..\Doc\paper procedural terrain generation.pdf">
       <Filter>Resource Files\Doc</Filter>
     </None>
+    <None Include="..\Shaders\tessellationControl.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\tessellationEvaluation.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Textures\cliff.bmp">

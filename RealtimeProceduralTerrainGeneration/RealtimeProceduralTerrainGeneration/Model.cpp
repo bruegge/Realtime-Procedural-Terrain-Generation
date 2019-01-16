@@ -120,11 +120,15 @@ void CModel::draw(CShader* pShader, CCamera* pCamera)
 	GLuint uniformLocationModelMatrix = glGetUniformLocation(pShader->getID(), "modelMatrix");
 	GLuint uniformLocationViewMatrix = glGetUniformLocation(pShader->getID(), "viewMatrix");
 	GLuint uniformLocationProjectionMatrix = glGetUniformLocation(pShader->getID(), "projectionMatrix");
+	GLuint uniformLocationCameraPosition = glGetUniformLocation(pShader->getID(), "cameraPosition");
 
+	glm::vec3 cameraPosition = pCamera->GetPosition();
+
+	glUniform3f(uniformLocationCameraPosition, cameraPosition.x, cameraPosition.y, cameraPosition.z);
 	glUniformMatrix4fv(uniformLocationModelMatrix, 1, GL_FALSE, &m_mModelMatrix[0][0]);
 	glUniformMatrix4fv(uniformLocationViewMatrix, 1, GL_FALSE, &(pCamera->GetViewMatrix()[0][0]));
 	glUniformMatrix4fv(uniformLocationProjectionMatrix, 1, GL_FALSE, &(pCamera->GetProjectionMatrix()[0][0]));
-	glDrawElements(GL_TRIANGLES, m_nCountIBO, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_PATCHES, m_nCountIBO, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 	pShader->unBind();
 }

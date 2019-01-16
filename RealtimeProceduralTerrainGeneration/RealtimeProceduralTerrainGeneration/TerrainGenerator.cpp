@@ -52,14 +52,17 @@ std::vector<GLfloat>* CTerrainGenerator::GetDataSet()
 {
 	return &m_vecDataSet;
 }
+
 void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
 {
 
 }
+
 void CTerrainGenerator::GenerateErosion(unsigned int nSteps)
 {
 
 }
+
 void CTerrainGenerator::GenerateNoise()
 {
 	m_vecDataSet.resize(m_nHeight*m_nWidth * 3);

@@ -16,7 +16,7 @@
 
 int windowWidth = 800;
 int windowHeight = 600;
-
+unsigned int nTerrainWidth = 50;
 CModel* pTerrain;
 CShader* pShader;
 CTexture* pTextureTerrain;
@@ -34,18 +34,25 @@ void loadContent() //load all objects and fill them
 	srand(time(NULL));
 	//create 100 cubes
 	pTerrain = new CModel();
-	pTerrainGenerator = new CTerrainGenerator(224, 224);
+	pTerrainGenerator = new CTerrainGenerator(nTerrainWidth, nTerrainWidth);
 	std::pair<std::vector<CModel::SDataVBO>, std::vector<GLuint>> meshData = pTerrainGenerator->GenerateMeshData();
 
 	pTerrain->SetVBOandIBOData(&(meshData.first), &(meshData.second));
 	//create camera
 	pCamera = new CCamera(90, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 1000.0f, glm::vec3(0, 0, 7), glm::vec3(0, 0, -10), glm::vec3(0, 1, 0));
 	//create shader program
-	pShader = CShader::createShaderProgram("../shaders/vertex.glsl", nullptr, nullptr, "../shaders/geometry.glsl", "../shaders/fragment.glsl");
+	glPatchParameteri(GL_PATCH_VERTICES, 3);
+	pShader = CShader::createShaderProgram("../shaders/vertex.glsl", 
+											"../shaders/tessellationControl.glsl",
+											"../shaders/tessellationEvaluation.glsl",
+											nullptr, 
+											"../shaders/fragment.glsl");
 	//create and load texture
-	//pTextureTerrain = new CTexture("../textures/testTerrain.bmp");
 	pTextureTerrain = new CTexture();
 	pTerrainGenerator->GenerateNoise();
+	pTerrainGenerator->GenerateVoronoi(50);
+	pTerrainGenerator->GenerateErosion(50);
+
 	pTextureCliff = new CTexture("../textures/cliff.bmp");
 	pTextureGrass = new CTexture("../textures/grass.bmp");
 	pTextureMud = new CTexture("../textures/mud.bmp");
@@ -80,7 +87,7 @@ void programLoop(CGLFWWindow* window)
 		if (glfwGetKey(window->getWindowPointer(), GLFW_KEY_3) == GLFW_PRESS)
 		{
 			std::vector<GLfloat>* pTerrainData = pTerrainGenerator->GetDataSet();
-			pTextureTerrain->SetTextureData(224, 224, pTerrainData);
+			pTextureTerrain->SetTextureData(nTerrainWidth, nTerrainWidth, pTerrainData);
 		}
 		if (glfwGetKey(window->getWindowPointer(), GLFW_KEY_4) == GLFW_PRESS)
 		{

@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec2 textureCoordinate;
@@ -11,13 +11,17 @@ uniform sampler2D texture1;
 
 out VS_OUT 
 {
-    vec2 vertexTextureCoordinates;
+    vec3 vertexPositionWS;
+	vec3 vertexPositionVS;
+	vec2 vertexTextureCoordinates;
 } vs_out;
 
 void main()
 {
 	vec4 textureDepth = texture(texture1, textureCoordinate.xy);
 	vec4 positionHeight = vec4(position.xy, textureDepth.x,1);
-	gl_Position = positionHeight;
+	vs_out.vertexPositionWS = positionHeight.xyz;
 	vs_out.vertexTextureCoordinates = textureCoordinate;
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * positionHeight;
+	vs_out.vertexPositionVS = gl_Position.xyz;
 }

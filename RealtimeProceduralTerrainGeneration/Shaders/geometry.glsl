@@ -3,16 +3,19 @@
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 3) out;
 
-in VS_OUT 
+in TES_OUT 
 {
-    vec2 vertexTextureCoordinates;
+    vec3 vertexPositionWS;
+	vec3 vertexPositionVS;
+	vec2 vertexTextureCoordinates;
 } gs_in[];  
 
 out GS_OUT 
 {
+    vec3 vertexPositionWS;
+	vec3 vertexPositionVS;
     vec2 vertexTextureCoordinates;
 	vec3 vertexNormal;
-	vec3 vertexPosition;
 } gs_out;  
 
 uniform mat4 modelMatrix;
@@ -23,27 +26,27 @@ const float heightOffset = -1.0f;
 
 void main()
 {    
-	vec3 v1 = gl_in[0].gl_Position.xyz - gl_in[1].gl_Position.xyz;
-	vec3 v2 = gl_in[0].gl_Position.xyz - gl_in[2].gl_Position.xyz;
+	vec3 v1 = gs_in[0].vertexPositionWS - gs_in[1].vertexPositionWS;
+	vec3 v2 = gs_in[0].vertexPositionWS - gs_in[2].vertexPositionWS;
 	vec3 faceNormal = normalize(cross(v2,v1));
 
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(gl_in[0].gl_Position.xy,gl_in[0].gl_Position.z + heightOffset,1); 
 	gs_out.vertexTextureCoordinates = gs_in[0].vertexTextureCoordinates;
+    gs_out.vertexPositionWS = gs_in[0].vertexPositionWS;
+    gs_out.vertexPositionVS = gs_in[0].vertexPositionVS;
     gs_out.vertexNormal = faceNormal;
-	gs_out.vertexPosition = gl_in[0].gl_Position.xyz;
 	EmitVertex();
 
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(gl_in[1].gl_Position.xy,gl_in[1].gl_Position.z + heightOffset,1); 
-	gs_out.vertexTextureCoordinates = gs_in[1].vertexTextureCoordinates;
+    gs_out.vertexTextureCoordinates = gs_in[1].vertexTextureCoordinates;
+    gs_out.vertexPositionWS = gs_in[1].vertexPositionWS;
+    gs_out.vertexPositionVS = gs_in[1].vertexPositionVS;
     gs_out.vertexNormal = faceNormal;
-    gs_out.vertexPosition = gl_in[1].gl_Position.xyz;
 	EmitVertex();
    
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(gl_in[2].gl_Position.xy,gl_in[2].gl_Position.z + heightOffset,1); 
 	gs_out.vertexTextureCoordinates = gs_in[2].vertexTextureCoordinates;
+    gs_out.vertexPositionWS = gs_in[2].vertexPositionWS;
+    gs_out.vertexPositionVS = gs_in[2].vertexPositionVS;
     gs_out.vertexNormal = faceNormal;
-	gs_out.vertexPosition = gl_in[2].gl_Position.xyz;
-    EmitVertex();
+	EmitVertex();
     
     EndPrimitive();
 }  

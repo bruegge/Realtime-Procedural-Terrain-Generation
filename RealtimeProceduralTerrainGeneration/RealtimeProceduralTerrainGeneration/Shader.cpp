@@ -1,6 +1,7 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <iostream>
 
 #include "Shader.h"
 
@@ -42,6 +43,28 @@ GLuint CreateShader(GLenum type, const char* pPath)
 	{
 		std::vector<char> vecShaderErrorMessage(nInfoLogLength + 1);
 		glGetShaderInfoLog(nShaderID, nInfoLogLength, NULL, &vecShaderErrorMessage[0]);
+		std::string shaderType = "";
+		switch (type)
+		{
+		case GL_VERTEX_SHADER:
+			shaderType = "GL_VERTEX_SHADER";
+			break;
+		case GL_TESS_CONTROL_SHADER:
+			shaderType = "GL_TESS_CONTROL_SHADER";
+			break;
+		case GL_TESS_EVALUATION_SHADER:
+			shaderType = "GL_TESS_EVALUATION_SHADER";
+			break;
+		case GL_GEOMETRY_SHADER:
+			shaderType = "GL_GEOMETRY_SHADER";
+			break;
+		case GL_FRAGMENT_SHADER:
+			shaderType = "GL_FRAGMENT_SHADER";
+			break;
+		default:
+			break;
+		}
+		std::cout << "Error in "<<shaderType<<" :\n";
 		printf("%s\n", &vecShaderErrorMessage[0]);
 	}
 	return nShaderID;
