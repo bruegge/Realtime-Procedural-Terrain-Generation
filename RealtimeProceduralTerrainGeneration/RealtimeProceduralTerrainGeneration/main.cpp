@@ -16,14 +16,14 @@
 
 int windowWidth = 800;
 int windowHeight = 600;
-unsigned int nTerrainWidth = 50;
+unsigned int nTerrainWidth = 100;
 CModel* pTerrain;
 CShader* pShader;
 CTexture* pTextureTerrain;
+CTexture* pTextureNormal;
 CTexture* pTextureGrass;
 CTexture* pTextureSnow;
 CTexture* pTextureCliff;
-CTexture* pTextureMud;
 
 CCamera* pCamera;
 CTerrainGenerator* pTerrainGenerator;
@@ -41,7 +41,7 @@ void loadContent() //load all objects and fill them
 	//create camera
 	pCamera = new CCamera(90, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 1000.0f, glm::vec3(0, 0, 7), glm::vec3(0, 0, -10), glm::vec3(0, 1, 0));
 	//create shader program
-	glPatchParameteri(GL_PATCH_VERTICES, 3);
+	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	pShader = CShader::createShaderProgram("../shaders/vertex.glsl", 
 											"../shaders/tessellationControl.glsl",
 											"../shaders/tessellationEvaluation.glsl",
@@ -49,13 +49,13 @@ void loadContent() //load all objects and fill them
 											"../shaders/fragment.glsl");
 	//create and load texture
 	pTextureTerrain = new CTexture();
+	pTextureNormal = new CTexture();
 	pTerrainGenerator->GenerateNoise();
 	pTerrainGenerator->GenerateVoronoi(50);
 	pTerrainGenerator->GenerateErosion(50);
-
-	pTextureCliff = new CTexture("../textures/cliff.bmp");
+	pTerrainGenerator->GenerateDerivatives();
 	pTextureGrass = new CTexture("../textures/grass.bmp");
-	pTextureMud = new CTexture("../textures/mud.bmp");
+	pTextureCliff = new CTexture("../textures/cliff.bmp");
 	pTextureSnow = new CTexture("../textures/snow.bmp");
 
 	//bind keys to the objects operations
@@ -64,7 +64,9 @@ void loadContent() //load all objects and fill them
 	
 	pCamera->AddKeyBinding(GLFW_KEY_W, std::bind(&CCamera::Forward, pCamera, std::placeholders::_1));
 	pCamera->AddKeyBinding(GLFW_KEY_S, std::bind(&CCamera::Backward, pCamera, std::placeholders::_1));
-	
+	pCamera->AddKeyBinding(GLFW_KEY_A, std::bind(&CCamera::TurnX, pCamera, -1));
+	pCamera->AddKeyBinding(GLFW_KEY_D, std::bind(&CCamera::TurnX, pCamera, 1));
+
 	std::cout << "Content loaded" << std::endl;
 }
 
@@ -86,24 +88,26 @@ void programLoop(CGLFWWindow* window)
 		//check to change terrain
 		if (glfwGetKey(window->getWindowPointer(), GLFW_KEY_3) == GLFW_PRESS)
 		{
-			std::vector<GLfloat>* pTerrainData = pTerrainGenerator->GetDataSet();
-			pTextureTerrain->SetTextureData(nTerrainWidth, nTerrainWidth, pTerrainData);
+			std::vector<GLfloat>* pTerrainData = pTerrainGenerator->GetDataHeight();
+			pTextureTerrain->SetTextureData(nTerrainWidth, nTerrainWidth, 1, pTerrainData);
+			std::vector<GLfloat>* pTerrainDataNormal = pTerrainGenerator->GetData2ndDerivativeAccumulated();
+			pTextureNormal->SetTextureData(nTerrainWidth, nTerrainWidth, 3, pTerrainDataNormal);
 		}
 		if (glfwGetKey(window->getWindowPointer(), GLFW_KEY_4) == GLFW_PRESS)
 		{
 			pTextureTerrain->LoadTexture("../textures/testTerrain.bmp");
 		}
 		pShader->bind();
-		pTextureTerrain->Link(pShader, 0, "texture1");
-		pTextureCliff->Link(pShader, 1, "textureCliff");
+		pTextureTerrain->Link(pShader, 0, "textureTerrain");
+		pTextureNormal->Link(pShader, 1, "textureTerrain2ndDerAcc");
 		pTextureGrass->Link(pShader, 2, "textureGrass");
-		pTextureMud->Link(pShader, 3, "textureMud");
+		pTextureCliff->Link(pShader, 3, "textureCliff");
 		pTextureSnow->Link(pShader, 4, "textureSnow");
 
 		pTextureTerrain->Bind(0);
-		pTextureCliff->Bind(1);
-		pTextureGrass->Bind(2);
-		pTextureMud->Bind(3);
+		pTextureNormal->Bind(1);
+		pTextureGrass->Bind(2); 
+		pTextureCliff->Bind(3);
 		pTextureSnow->Bind(4);
 
 		//draw terrain	
@@ -129,7 +133,6 @@ void deleteContent() //delete the objects
 	delete pTextureTerrain;
 	delete pTextureCliff;
 	delete pTextureGrass;
-	delete pTextureMud;
 	delete pTextureSnow;
 	delete pCamera;
 }

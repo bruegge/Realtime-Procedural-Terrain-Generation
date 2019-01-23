@@ -50,7 +50,7 @@ void CTexture::LoadTexture(const char* pTexturePath)
 	glBindTexture(GL_TEXTURE_2D, 0); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 }
 
-void CTexture::SetTextureData(unsigned int nWidth, unsigned int nHeight, std::vector<GLfloat>* data)
+void CTexture::SetTextureData(unsigned int nWidth, unsigned int nHeight, unsigned int nCountChannels, std::vector<GLfloat>* data)
 {
 	if (m_nID)
 	{
@@ -60,11 +60,32 @@ void CTexture::SetTextureData(unsigned int nWidth, unsigned int nHeight, std::ve
 	glBindTexture(GL_TEXTURE_2D, m_nID); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 	glEnable(GL_TEXTURE_2D);
 	// set the texture wrapping parameters
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, nWidth, nHeight, 0, GL_RED, GL_FLOAT, &data->front());
+	GLenum format = GL_RED;
+	GLenum format2 = GL_R32F;
+	switch (nCountChannels)
+	{
+	case 1:
+		format = GL_RED;
+		format2 = GL_R32F;
+		break;
+	case 2:
+		format = GL_RG;
+		break;
+	case 3:
+		format = GL_RGB;
+		format2 = GL_RGB32F;
+		break;
+	case 4:
+		format = GL_RGBA;
+		break;
+	default:
+		break;
+	}
+	glTexImage2D(GL_TEXTURE_2D, 0, format2, nWidth, nHeight, 0, format, GL_FLOAT, &data->front());
 	glGenerateMipmap(GL_TEXTURE_2D);
 	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	// set texture wrapping to GL_REPEAT (default wrapping method)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	// set texture filtering parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
