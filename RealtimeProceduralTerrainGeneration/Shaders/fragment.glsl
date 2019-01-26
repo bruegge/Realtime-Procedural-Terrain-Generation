@@ -11,7 +11,6 @@ in TES_OUT
     vec3 vertexPositionWS;
 	vec3 vertexPositionVS;
     vec2 vertexTextureCoordinates;
-	vec3 color;
 } fs_in;  
 
 vec3 LinearInterpolationWithBoundaryCheck(vec3 color0, vec3 color1, float interpolatedValue, float minValue, float maxValue)
@@ -52,5 +51,5 @@ void main()
 {	
 	vec3 normal = texture(textureTerrain2ndDerAcc, fs_in.vertexTextureCoordinates).xyz;
 	color = vec4(CalculateColor(fs_in.vertexTextureCoordinates,fs_in.vertexPositionWS.z, normal.z), 1);
-	//color = vec4(abs(normal)/2000.0f,1);
+	color = vec4(abs(normal)/2000.0f,1);
 }

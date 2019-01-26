@@ -41,22 +41,22 @@ void main(void)
 {
 	if(gl_InvocationID == 0)
 	{
-		
+		/*
 		float distanceCameraToV0 = distance(cameraPosition, tcs_in[0].vertexPositionWS);
 		float distanceCameraToV1 = distance(cameraPosition, tcs_in[1].vertexPositionWS);
 		float distanceCameraToV2 = distance(cameraPosition, tcs_in[2].vertexPositionWS);
 		
-		/*gl_TessLevelOuter[0] = GetTessLevelCamera(distanceCameraToV1, distanceCameraToV2);
+		gl_TessLevelOuter[0] = GetTessLevelCamera(distanceCameraToV1, distanceCameraToV2);
 		gl_TessLevelOuter[1] = GetTessLevelCamera(distanceCameraToV2, distanceCameraToV0);
 		gl_TessLevelOuter[2] = GetTessLevelCamera(distanceCameraToV0, distanceCameraToV1);
-		gl_TessLevelInner[0] = gl_TessLevelOuter[0];*/
-		
+		gl_TessLevelInner[0] = gl_TessLevelOuter[0];
+		*/
 		vec3 p0 = texture(textureTerrain2ndDerAcc, tcs_in[0].vertexTextureCoordinates).xyz;
 		vec3 p1 = texture(textureTerrain2ndDerAcc, tcs_in[1].vertexTextureCoordinates).xyz;
 		vec3 p2 = texture(textureTerrain2ndDerAcc, tcs_in[2].vertexTextureCoordinates).xyz;
 		vec3 p3 = texture(textureTerrain2ndDerAcc, tcs_in[3].vertexTextureCoordinates).xyz;
 		
-		float tessFactor = 10;
+		float tessFactor = 5;
 		float tess0 = max(1, abs(p0.y - p2.y) / tessFactor);
 		float tess2 = max(1, abs(p3.y - p1.y) / tessFactor);
 		float tess1 = max(1, abs(p0.x - p1.x) / tessFactor);
