@@ -22,5 +22,5 @@ void main()
 	vec4 positionHeight = vec4(position.xy, textureDepth.x,1);
 	vs_out.vertexPositionWS = positionHeight.xyz;
 	vs_out.vertexTextureCoordinates = textureCoordinate;
-	vs_out.vertexPositionVS = gl_Position.xyz;
+	vs_out.vertexPositionVS = vec3(0,0,0);
 }
