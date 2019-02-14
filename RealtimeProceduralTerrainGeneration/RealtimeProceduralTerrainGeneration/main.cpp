@@ -51,7 +51,7 @@ void loadContent() //load all objects and fill them
 	pTextureTerrain = new CTexture();
 	pTextureNormal = new CTexture();
 	pTerrainGenerator->GenerateNoise();
-	pTerrainGenerator->GenerateVoronoi(50);
+	pTerrainGenerator->GenerateVoronoi(20);
 	pTerrainGenerator->GenerateErosion(50);
 	pTerrainGenerator->GenerateDerivatives();
 	pTextureGrass = new CTexture("../textures/grass.bmp");

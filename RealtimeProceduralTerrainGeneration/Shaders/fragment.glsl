@@ -25,15 +25,15 @@ vec3 LinearInterpolationWithBoundaryCheck(vec3 color0, vec3 color1, float interp
 
 vec3 CalculateColor(vec2 textureCoordinate, float height, float normal)
 {
-	float textureScale = 300.0f;
-	float mipmapLevel = textureQueryLod(textureGrass, textureCoordinate*textureScale).x;
+	float textureScale = 30.0f;
+	float mipmapLevel = textureQueryLod(textureGrass, textureCoordinate*textureScale).x/30.0f;
    	
 	vec2 texCoord1 = textureCoordinate*textureScale;
 	vec2 texCoord2 = textureCoordinate*textureScale*3.88f;
 	
-	vec3 Grass = texture(textureGrass, texCoord1).xyz;
-	vec3 Cliff = texture(textureCliff, texCoord1).xyz;
-	vec3 Snow = texture(textureSnow, texCoord1).xyz;
+	vec3 Grass = texture(textureGrass, texCoord1, mipmapLevel).xyz;
+	vec3 Cliff = texture(textureCliff, texCoord1, mipmapLevel).xyz;
+	vec3 Snow = texture(textureSnow, texCoord1, mipmapLevel).xyz;
 	
 	vec3 colorValue = vec3(0,0,0);
 		
@@ -51,5 +51,6 @@ void main()
 {	
 	vec3 normal = texture(textureTerrain2ndDerAcc, fs_in.vertexTextureCoordinates).xyz;
 	color = vec4(CalculateColor(fs_in.vertexTextureCoordinates,fs_in.vertexPositionWS.z, normal.z), 1);
-	color = vec4(abs(normal)/2000.0f,1);
+	//color = vec4(abs(normal)/2000.0f,1);
+	//color = vec4(fs_in.vertexPositionWS.z, fs_in.vertexPositionWS.z, fs_in.vertexPositionWS.z, 1);
 }

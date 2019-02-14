@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include "Model.h"
+#include <stdlib.h>
+
 class CTerrainGenerator
 {
 public:

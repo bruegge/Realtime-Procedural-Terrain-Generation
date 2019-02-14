@@ -1,4 +1,5 @@
 #include "TerrainGenerator.h"
+#include <iostream>
 
 CTerrainGenerator::CTerrainGenerator(unsigned int nWidth, unsigned int nHeight)
 {
@@ -69,7 +70,43 @@ std::vector<GLfloat>* CTerrainGenerator::GetData2ndDerivativeAccumulated()
 
 void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
 {
+	std::vector<glm::vec2> vecRandomNumbers(nCount);
+	for (unsigned int i = 0; i< nCount; ++i)
+	{
+		vecRandomNumbers[i].x = rand() % m_nWidth;
+		vecRandomNumbers[i].y = rand() % m_nHeight;
+	}
 
+	float fDiagonal = sqrt(m_nWidth * m_nWidth + m_nHeight * m_nHeight) / 5.0f;
+
+	for (unsigned int x = 0; x < m_nWidth; ++x)
+	{
+		for (unsigned int y = 0; y < m_nHeight; ++y)
+		{
+			glm::vec2 position = glm::vec2(x, y);
+			float fDistance1stClosest = 100;
+			float fDistance2ndClosest = 100;
+
+			for each (glm::vec2 var in vecRandomNumbers)
+			{
+				float fDistance = glm::length(var - position) / fDiagonal;
+				fDistance = std::fmin(fDistance, glm::length(var - glm::vec2(m_nWidth, 0) - position) / fDiagonal);
+				fDistance = std::fmin(fDistance, glm::length(var + glm::vec2(m_nWidth, 0) - position) / fDiagonal);
+				fDistance = std::fmin(fDistance, glm::length(var - glm::vec2(0, m_nHeight) - position) / fDiagonal);
+				fDistance = std::fmin(fDistance, glm::length(var + glm::vec2(0, m_nHeight) - position) / fDiagonal);
+				if (fDistance < fDistance1stClosest)
+				{
+					fDistance2ndClosest = fDistance1stClosest;
+					fDistance1stClosest = fDistance;
+				}
+				else if (fDistance < fDistance2ndClosest)
+				{
+					fDistance2ndClosest = fDistance;
+				}
+			}
+			m_vecDataSetHeight[(x*m_nHeight + y)] = (-fDistance1stClosest + fDistance2ndClosest);
+		}
+	}
 }
 
 void CTerrainGenerator::GenerateErosion(unsigned int nSteps)
