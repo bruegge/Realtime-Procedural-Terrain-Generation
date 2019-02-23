@@ -4,6 +4,7 @@ layout (vertices = 4) out;
 
 uniform vec3 cameraPosition = vec3(10,0,0);
 uniform sampler2D textureTerrain2ndDerAcc;
+uniform float fWidth;
 
 in VS_OUT
 {
@@ -56,11 +57,11 @@ void main(void)
 		vec3 p2 = texture(textureTerrain2ndDerAcc, tcs_in[2].vertexTextureCoordinates).xyz;
 		vec3 p3 = texture(textureTerrain2ndDerAcc, tcs_in[3].vertexTextureCoordinates).xyz;
 		
-		float tessFactor = 5;
-		float tess0 = max(1, abs(p0.y - p2.y) / tessFactor);
-		float tess2 = max(1, abs(p3.y - p1.y) / tessFactor);
-		float tess1 = max(1, abs(p0.x - p1.x) / tessFactor);
-		float tess3 = max(1, abs(p2.x - p3.x) / tessFactor);
+		float tessFactor = fWidth;
+		float tess0 = max(1, abs(p0.y - p2.y) * tessFactor);
+		float tess2 = max(1, abs(p3.y - p1.y) * tessFactor);
+		float tess1 = max(1, abs(p0.x - p1.x) * tessFactor);
+		float tess3 = max(1, abs(p2.x - p3.x) * tessFactor);
 		float tessDiagonal = 1;
 		gl_TessLevelOuter[0] = tess0;
 		gl_TessLevelOuter[1] = tess1;

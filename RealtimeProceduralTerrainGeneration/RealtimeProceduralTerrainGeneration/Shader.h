@@ -14,6 +14,8 @@ public:
 		const char* pTesselationEvaluation_file_path = nullptr,
 		const char* pGeometry_file_path = nullptr,
 		const char* pFragment_file_path = nullptr);
+	static CShader* createComputeShaderProgram(const char* pComputeShader_file_path);
+
 	static std::vector<CShader*> getShaders(); //returns all shaders build in this program
 
 	void bind();
@@ -22,6 +24,6 @@ public:
 private:
 	
 	GLuint ID;
-	
+	bool m_bComputeShaderEnabled;
 	CShader(int id);
 };

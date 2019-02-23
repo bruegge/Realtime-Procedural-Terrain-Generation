@@ -57,7 +57,7 @@ void CTexture::LoadTexture(const char* pTexturePath)
 	glBindTexture(GL_TEXTURE_2D, 0); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 }
 
-void CTexture::SetTextureData(unsigned int nWidth, unsigned int nHeight, unsigned int nCountChannels, std::vector<GLfloat>* data)
+void CTexture::SetTextureData(unsigned int nWidth, unsigned int nHeight, unsigned int nCountChannels, std::vector<GLfloat>* data, bool bCreateMipmaps)
 {
 	if (m_nID)
 	{
@@ -77,6 +77,7 @@ void CTexture::SetTextureData(unsigned int nWidth, unsigned int nHeight, unsigne
 		break;
 	case 2:
 		format = GL_RG;
+		format2 = GL_RG32F;
 		break;
 	case 3:
 		format = GL_RGB;
@@ -84,17 +85,34 @@ void CTexture::SetTextureData(unsigned int nWidth, unsigned int nHeight, unsigne
 		break;
 	case 4:
 		format = GL_RGBA;
+		format2 = GL_RGBA32F;
 		break;
 	default:
 		break;
 	}
-	glTexImage2D(GL_TEXTURE_2D, 0, format2, nWidth, nHeight, 0, format, GL_FLOAT, &data->front());
-	glGenerateMipmap(GL_TEXTURE_2D);
-	
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, format2, nWidth, nHeight, 0, format, GL_FLOAT, &data->front());
+	}
+	else
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, format2, nWidth, nHeight, 0, format, GL_FLOAT, NULL);
+	}
+	if (bCreateMipmaps)
+	{
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	// set texture wrapping to GL_REPEAT (default wrapping method)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	if (bCreateMipmaps)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	}
+	else
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	}
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glBindTexture(GL_TEXTURE_2D, 0); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object

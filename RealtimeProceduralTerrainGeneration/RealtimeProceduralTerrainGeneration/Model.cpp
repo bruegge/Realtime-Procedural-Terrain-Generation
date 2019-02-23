@@ -1,7 +1,8 @@
 #include "Model.h"
 
-CModel::CModel()
+CModel::CModel(float nTerrainWidth)
 {
+	m_nTerrainWidth = nTerrainWidth;
 	glGenVertexArrays(1, &m_nVAO);
 	glBindVertexArray(m_nVAO);
 	glGenBuffers(1, &m_nIBO);
@@ -117,13 +118,15 @@ void CModel::draw(CShader* pShader, CCamera* pCamera)
 {
 	pShader->bind();
 	glBindVertexArray(m_nVAO); //bind the VAO including VBO, IBO ...
-	GLuint uniformLocationModelMatrix = glGetUniformLocation(pShader->getID(), "modelMatrix");
-	GLuint uniformLocationViewMatrix = glGetUniformLocation(pShader->getID(), "viewMatrix");
-	GLuint uniformLocationProjectionMatrix = glGetUniformLocation(pShader->getID(), "projectionMatrix");
-	GLuint uniformLocationCameraPosition = glGetUniformLocation(pShader->getID(), "cameraPosition");
+	GLint uniformLocationModelMatrix = glGetUniformLocation(pShader->getID(), "modelMatrix");
+	GLint uniformLocationViewMatrix = glGetUniformLocation(pShader->getID(), "viewMatrix");
+	GLint uniformLocationProjectionMatrix = glGetUniformLocation(pShader->getID(), "projectionMatrix");
+	GLint uniformLocationCameraPosition = glGetUniformLocation(pShader->getID(), "cameraPosition");
+	GLint uniformLocationTerrainWidth = glGetUniformLocation(pShader->getID(), "fWidth");
 
 	glm::vec3 cameraPosition = pCamera->GetPosition();
-
+	
+	glUniform1f(uniformLocationTerrainWidth, m_nTerrainWidth);
 	glUniform3f(uniformLocationCameraPosition, cameraPosition.x, cameraPosition.y, cameraPosition.z);
 	glUniformMatrix4fv(uniformLocationModelMatrix, 1, GL_FALSE, &m_mModelMatrix[0][0]);
 	glUniformMatrix4fv(uniformLocationViewMatrix, 1, GL_FALSE, &(pCamera->GetViewMatrix()[0][0]));

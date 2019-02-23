@@ -16,11 +16,9 @@
 
 int windowWidth = 800;
 int windowHeight = 600;
-unsigned int nTerrainWidth = 100;
+unsigned int nTerrainWidth = 256;
 CModel* pTerrain;
 CShader* pShader;
-CTexture* pTextureTerrain;
-CTexture* pTextureNormal;
 CTexture* pTextureGrass;
 CTexture* pTextureSnow;
 CTexture* pTextureCliff;
@@ -33,8 +31,8 @@ void loadContent() //load all objects and fill them
 {
 	srand(time(NULL));
 	//create 100 cubes
-	pTerrain = new CModel();
-	pTerrainGenerator = new CTerrainGenerator(nTerrainWidth, nTerrainWidth);
+	pTerrain = new CModel(nTerrainWidth);
+	pTerrainGenerator = new CTerrainGenerator(nTerrainWidth);
 	std::pair<std::vector<CModel::SDataVBO>, std::vector<GLuint>> meshData = pTerrainGenerator->GenerateMeshData();
 
 	pTerrain->SetVBOandIBOData(&(meshData.first), &(meshData.second));
@@ -42,18 +40,12 @@ void loadContent() //load all objects and fill them
 	pCamera = new CCamera(90, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 1000.0f, glm::vec3(0, 0, 7), glm::vec3(0, 0, -10), glm::vec3(0, 1, 0));
 	//create shader program
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
-	pShader = CShader::createShaderProgram("../shaders/vertex.glsl", 
-											"../shaders/tessellationControl.glsl",
-											"../shaders/tessellationEvaluation.glsl",
+	pShader = CShader::createShaderProgram("../shaders/VS_vertex.glsl", 
+											"../shaders/TCS_tessellationControl.glsl",
+											"../shaders/TES_tessellationEvaluation.glsl",
 											nullptr, 
-											"../shaders/fragment.glsl");
+											"../shaders/FS_fragment.glsl");
 	//create and load texture
-	pTextureTerrain = new CTexture();
-	pTextureNormal = new CTexture();
-	pTerrainGenerator->GenerateNoise();
-	pTerrainGenerator->GenerateVoronoi(20);
-	pTerrainGenerator->GenerateErosion(50);
-	pTerrainGenerator->GenerateDerivatives();
 	pTextureGrass = new CTexture("../textures/grass.bmp");
 	pTextureCliff = new CTexture("../textures/cliff.bmp");
 	pTextureSnow = new CTexture("../textures/snow.bmp");
@@ -88,27 +80,28 @@ void programLoop(CGLFWWindow* window)
 		//check to change terrain
 		if (glfwGetKey(window->getWindowPointer(), GLFW_KEY_3) == GLFW_PRESS)
 		{
-			std::vector<GLfloat>* pTerrainData = pTerrainGenerator->GetDataHeight();
-			pTextureTerrain->SetTextureData(nTerrainWidth, nTerrainWidth, 1, pTerrainData);
-			std::vector<GLfloat>* pTerrainDataNormal = pTerrainGenerator->GetData2ndDerivativeAccumulated();
-			pTextureNormal->SetTextureData(nTerrainWidth, nTerrainWidth, 3, pTerrainDataNormal);
+			pTerrainGenerator->GenerateHeightMapCPU(7,50); 
 		}
 		if (glfwGetKey(window->getWindowPointer(), GLFW_KEY_4) == GLFW_PRESS)
 		{
-			pTextureTerrain->LoadTexture("../textures/testTerrain.bmp");
+			pTerrainGenerator->GenerateHeightMapGPU(7, 50);
 		}
+	
 		pShader->bind();
-		pTextureTerrain->Link(pShader, 0, "textureTerrain");
-		pTextureNormal->Link(pShader, 1, "textureTerrain2ndDerAcc");
-		pTextureGrass->Link(pShader, 2, "textureGrass");
-		pTextureCliff->Link(pShader, 3, "textureCliff");
-		pTextureSnow->Link(pShader, 4, "textureSnow");
+		
+		pTerrainGenerator->GetHeightMap()->Link(pShader, 0, "textureTerrain");
+		pTerrainGenerator->GetNormalMap()->Link(pShader, 1, "textureTerrainNormal");
+		pTerrainGenerator->Get2ndDerivativeMap()->Link(pShader, 2, "textureTerrain2ndDerAcc");
+		pTextureGrass->Link(pShader, 3, "textureGrass");
+		pTextureCliff->Link(pShader, 4, "textureCliff");
+		pTextureSnow->Link(pShader, 5, "textureSnow");
 
-		pTextureTerrain->Bind(0);
-		pTextureNormal->Bind(1);
-		pTextureGrass->Bind(2); 
-		pTextureCliff->Bind(3);
-		pTextureSnow->Bind(4);
+		pTerrainGenerator->GetHeightMap()->Bind(0);
+		pTerrainGenerator->GetNormalMap()->Bind(1);
+		pTerrainGenerator->Get2ndDerivativeMap()->Bind(2);
+		pTextureGrass->Bind(3); 
+		pTextureCliff->Bind(4);
+		pTextureSnow->Bind(5);
 
 		//draw terrain	
 		pTerrain->draw(pShader, pCamera); //draws the triangle with the given shader
@@ -130,7 +123,6 @@ void deleteContent() //delete the objects
 	delete pTerrain;
 	delete pTerrainGenerator;
 	delete pShader;
-	delete pTextureTerrain;
 	delete pTextureCliff;
 	delete pTextureGrass;
 	delete pTextureSnow;

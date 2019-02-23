@@ -13,7 +13,7 @@ public:
 
 	void Bind(unsigned int nBindNumber); //nBindNumber is the number of the texture starting at 0. pLocationName is the variable name of the texture inside the shader
 	GLuint GetTextureID();
-	void SetTextureData(unsigned int nWidth, unsigned int nHeight, unsigned int nCountChannels, std::vector<GLfloat>* data);
+	void SetTextureData(unsigned int nWidth, unsigned int nHeight, unsigned int nCountChannels, std::vector<GLfloat>* data, bool bCreateMipmaps);
 	void LoadTexture(const char* pTexturePath);
 private:
 	GLuint m_nID = 0; //texture id

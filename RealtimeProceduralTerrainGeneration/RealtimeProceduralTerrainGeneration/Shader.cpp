@@ -46,6 +46,9 @@ GLuint CreateShader(GLenum type, const char* pPath)
 		std::string shaderType = "";
 		switch (type)
 		{
+		case GL_COMPUTE_SHADER:
+			shaderType = "GL_COMPUTE_SHADER";
+			break;
 		case GL_VERTEX_SHADER:
 			shaderType = "GL_VERTEX_SHADER";
 			break;
@@ -124,6 +127,39 @@ GLuint CreateShaderProgram(const char* pVertex_file_path, const char* pTessContr
 	return nProgramID;
 }
 
+GLuint CreateShaderProgram(const char* pComputeShader_file_path)
+{
+	GLuint nComputeShaderID;
+	
+	// Create the shaders
+	nComputeShaderID = CreateShader(GL_COMPUTE_SHADER, pComputeShader_file_path); 
+	
+	// Link the program
+	printf("Linking program\n");
+	GLuint nProgramID = glCreateProgram();
+	glAttachShader(nProgramID, nComputeShaderID);
+	glLinkProgram(nProgramID);
+
+	// Check the program
+	GLint nResult = GL_FALSE;
+	int nInfoLogLength;
+
+	glGetProgramiv(nProgramID, GL_LINK_STATUS, &nResult);
+	glGetProgramiv(nProgramID, GL_INFO_LOG_LENGTH, &nInfoLogLength);
+	if (nInfoLogLength > 1)
+	{
+		std::vector<char> vecProgramErrorMessage(nInfoLogLength + 1);
+		glGetProgramInfoLog(nProgramID, nInfoLogLength, NULL, &vecProgramErrorMessage[0]);
+		printf("%s\n", &vecProgramErrorMessage[0]);
+		return 0;
+	}
+
+	glDetachShader(nProgramID, nComputeShaderID);
+	glDeleteShader(nComputeShaderID); 
+	
+	return nProgramID;
+}
+
 CShader::CShader(int ID)
 {
 	this->ID = ID;
@@ -148,6 +184,16 @@ CShader* CShader::createShaderProgram(const char* pVertex_file_path, const char*
 {
 	GLuint nProgramID = CreateShaderProgram(pVertex_file_path, pTessControl_file_path, pTessEvaluation_file_path, pGeometry_file_path, pFragment_file_path);
 	CShader* pShader = new CShader(nProgramID);
+	pShader->m_bComputeShaderEnabled = false;
+	vecShaders.push_back(pShader);
+	return pShader;
+}
+
+CShader* CShader::createComputeShaderProgram(const char* pComputeShader_file_path)
+{
+	GLuint nProgramID = CreateShaderProgram(pComputeShader_file_path);
+	CShader* pShader = new CShader(nProgramID);
+	pShader->m_bComputeShaderEnabled = true;
 	vecShaders.push_back(pShader);
 	return pShader;
 }

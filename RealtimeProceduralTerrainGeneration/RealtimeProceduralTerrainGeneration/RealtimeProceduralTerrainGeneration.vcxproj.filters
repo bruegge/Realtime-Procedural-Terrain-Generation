@@ -54,6 +54,9 @@
     <ClCompile Include="TerrainGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FrameBufferObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -80,25 +83,43 @@
     <ClInclude Include="TerrainGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FrameBufferObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Shaders\fragment.glsl">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="..\Shaders\vertex.glsl">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
     <None Include="ClassDiagram.cd" />
-    <None Include="..\Shaders\geometry.glsl">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
     <None Include="..\..\Doc\paper procedural terrain generation.pdf">
       <Filter>Resource Files\Doc</Filter>
     </None>
-    <None Include="..\Shaders\tessellationControl.glsl">
+    <None Include="..\Shaders\FS_fragment.glsl">
       <Filter>Resource Files\Shaders</Filter>
     </None>
-    <None Include="..\Shaders\tessellationEvaluation.glsl">
+    <None Include="..\Shaders\GS_geometry.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\TCS_tessellationControl.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\TES_tessellationEvaluation.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\VS_vertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\CS_Accumulate2ndDerivative.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\CS_Erosion.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\CS_Noise.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\CS_NormalAnd2ndDerivative.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\CS_Voronoi.glsl">
       <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>

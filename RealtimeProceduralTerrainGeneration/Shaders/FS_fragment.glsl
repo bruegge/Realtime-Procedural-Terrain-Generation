@@ -1,5 +1,6 @@
 #version 430 core
 uniform sampler2D textureTerrain;
+uniform sampler2D textureTerrainNormal;
 uniform sampler2D textureTerrain2ndDerAcc;
 uniform sampler2D textureGrass;
 uniform sampler2D textureCliff;
@@ -42,15 +43,16 @@ vec3 CalculateColor(vec2 textureCoordinate, float height, float normal)
 		
 	colorValue += LinearInterpolationWithBoundaryCheck(Grass, Cliff, height, 0.0f, border1);
 	colorValue += LinearInterpolationWithBoundaryCheck(Cliff, Snow, height, border1, border2);
-	colorValue += LinearInterpolationWithBoundaryCheck(Snow, Snow, height, border2, 1.0f);
+	colorValue += LinearInterpolationWithBoundaryCheck(Snow, Snow, height, border2, 2.0f);
 		
 	return colorValue;
 }
 
 void main()
 {	
-	vec3 normal = texture(textureTerrain2ndDerAcc, fs_in.vertexTextureCoordinates).xyz;
+	vec3 normal = texture(textureTerrainNormal, fs_in.vertexTextureCoordinates).xyz;
 	color = vec4(CalculateColor(fs_in.vertexTextureCoordinates,fs_in.vertexPositionWS.z, normal.z), 1);
-	//color = vec4(abs(normal)/2000.0f,1);
+	//color = vec4(normal,1);
+	//color = vec4(0,1,1,1);
 	//color = vec4(fs_in.vertexPositionWS.z, fs_in.vertexPositionWS.z, fs_in.vertexPositionWS.z, 1);
 }
