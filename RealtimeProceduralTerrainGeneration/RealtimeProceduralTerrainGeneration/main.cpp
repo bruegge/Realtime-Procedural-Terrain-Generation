@@ -16,8 +16,8 @@
 
 int windowWidth = 800;
 int windowHeight = 600;
-unsigned int nTerrainWidth = 200;
-unsigned int nTerrainGridWidth = 200;
+unsigned int nTerrainWidth = 256;
+unsigned int nTerrainGridWidth = 128;
 CModel* pTerrain;
 CShader* pShader;
 CTexture* pTextureGrass;

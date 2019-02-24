@@ -285,7 +285,7 @@ void CTerrainGenerator::GenerateDerivatives()
 	m_vecData1stDerivative.resize(m_nWidth*m_nWidth * 4);
 	m_vecData2ndDerivative.resize(m_nWidth*m_nWidth * 2);
 	m_vecData2ndDerivativeAccumulated.resize(m_nWidth*m_nWidth * 2);
-	float fPixelDistance = 10.0f / m_nWidth;
+	float fPixelDistance = 10.0f / m_nWidth * 2.0f;
 	//derivative 1st order
 	for (unsigned int x = 0; x < m_nWidth; ++x)
 	{
@@ -296,10 +296,10 @@ void CTerrainGenerator::GenerateDerivatives()
 			float fHeightY_1 = GetTerrainHeight(x, y - 1);
 			float fHeightY1 = GetTerrainHeight(x, y + 1);
 
-			float fZInXDir = (fHeightX_1 - fHeightX1);
-			float fZInYDir = (fHeightY_1 - fHeightY1);
-			glm::vec3 vXDir = glm::vec3(fPixelDistance, 0, fZInXDir);
-			glm::vec3 vYDir = glm::vec3(0, fPixelDistance, fZInYDir);
+			float fZInXDir = (fHeightX1 - fHeightX_1);
+			float fZInYDir = (fHeightY1 - fHeightY_1);
+			glm::vec3 vXDir = glm::vec3(fPixelDistance, 0, fZInYDir);
+			glm::vec3 vYDir = glm::vec3(0, fPixelDistance, fZInXDir);
 			glm::vec3 vNormal = glm::normalize(glm::cross(vXDir, vYDir));
 
 			m_vecData1stDerivative[(x*m_nWidth + y) * 4 + 0] = vNormal.x;

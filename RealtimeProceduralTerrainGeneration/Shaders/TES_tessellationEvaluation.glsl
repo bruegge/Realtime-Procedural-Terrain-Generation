@@ -48,37 +48,26 @@ vec2 Interpolate2D(vec2 p1, vec2 p2, vec2 p3, vec2 p4)
 float CalculateBernsteinpolynomDegree4(int i, float fT)
 {
 	float fBinomialkoeffizienten[4];
-	fBinomialkoeffizienten[0] = 4.0f;
-	fBinomialkoeffizienten[1] = 6.0f;
-	fBinomialkoeffizienten[2] = 4.0f;
+	fBinomialkoeffizienten[0] = 1.0f;
+	fBinomialkoeffizienten[1] = 3.0f;
+	fBinomialkoeffizienten[2] = 3.0f;
 	fBinomialkoeffizienten[3] = 1.0f;
 
-	return fBinomialkoeffizienten[i-1] * pow(fT,i) * pow(1-fT,4 - i);
-}
-
-vec3 CalculateControllPointHeight()
-{
-	ivec2 vTessCoord = ivec2((vec2(1,1)-gl_TessCoord.yx) * 3.999f);
-	
-	vec3 vPos = tes_in[0].bezierControlPoints[4*vTessCoord.y+vTessCoord.x];
-	
-	tes_out.color = vec3(vTessCoord/2,0);
-	
-	return vPos;	
+	return fBinomialkoeffizienten[i] * pow(fT,i) * pow(1-fT,3 - i);
 }
 
 float CalculateBezierSurfaceHeight()
 {
-	vec2 positionRelative = gl_TessCoord.xy;
+	vec2 positionRelative = vec2(1,1)-gl_TessCoord.yx;
 	float fHeight = 0.0f;
 	float xDirection[4];
 	float yDirection[4];
 	for(int i = 0; i<4; ++i)
 	{
-		xDirection[i] = CalculateBernsteinpolynomDegree4(i+1, positionRelative.x);
-		yDirection[i] = CalculateBernsteinpolynomDegree4(i+1, positionRelative.y);
-	}
-	
+		xDirection[i] = CalculateBernsteinpolynomDegree4(i, positionRelative.x);
+		yDirection[i] = CalculateBernsteinpolynomDegree4(i, positionRelative.y);
+	}	
+
 	for(int i = 0; i< 4; ++i)
 	{
 		for(int j = 0; j< 4; j++)
@@ -96,11 +85,10 @@ void main()
 	tes_out.vertexNormal = Interpolate3D(tes_in[0].vertexNormal, tes_in[1].vertexNormal,tes_in[2].vertexNormal,tes_in[3].vertexNormal);
 	tes_out.color = Interpolate3D(tes_in[0].color, tes_in[1].color, tes_in[2].color,tes_in[3].color);
 	
-	float textureDepth = texture(textureTerrain, tes_out.vertexTextureCoordinates).x;
-	
-	vec3 tangent = CalculateControllPointHeight();
-	
-	tes_out.vertexPositionWS.z = tangent.z;
+	float fHeight = CalculateBezierSurfaceHeight();
+	tes_out.vertexPositionWS.z = fHeight;
+
+	tes_out.color = tes_out.vertexNormal;
 
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(tes_out.vertexPositionWS,1);
 }	

@@ -88,12 +88,12 @@ void main(void)
 		float tess1 = max(1, abs(p0.x - p1.x) * tessFactor);
 		float tess3 = max(1, abs(p2.x - p3.x) * tessFactor);
 		float tessDiagonal = 1;
-		gl_TessLevelOuter[0] = 3;//tess0;
-		gl_TessLevelOuter[1] = 3;//tess1;
-		gl_TessLevelOuter[2] = 3;//tess2;
-		gl_TessLevelOuter[3] = 3;//tess3;
-		gl_TessLevelInner[0] = 3;//max(tess1, tess3);
-		gl_TessLevelInner[1] = 3;//max(tess2, tess0);
+		gl_TessLevelOuter[0] = tess0;
+		gl_TessLevelOuter[1] = tess1;
+		gl_TessLevelOuter[2] = tess2;
+		gl_TessLevelOuter[3] = tess3;
+		gl_TessLevelInner[0] = max(tess1, tess3);
+		gl_TessLevelInner[1] = max(tess2, tess0);
 	}
 
 	for(int i = 0; i< 16; ++i)
@@ -147,7 +147,6 @@ void main(void)
 	position1 = CalculateControlPointPositionYShift(tcs_out[gl_InvocationID].bezierControlPoints[14], interpolatedNormalX, -1);
 	position2 = CalculateControlPointPositionXShift(tcs_out[gl_InvocationID].bezierControlPoints[11], interpolatedNormalY, -1);
 	tcs_out[gl_InvocationID].bezierControlPoints[10] = (position1 + position2) / 2.0f;
-	
 
 	vec3 colors[4];
 	colors[0] = vec3(1,0,0);

@@ -54,7 +54,7 @@ void main()
 	//vec3 normal = texture(textureTerrainNormal, fs_in.vertexTextureCoordinates).xyz;
 	vec3 normal = fs_in.vertexNormal;
 	//color = vec4(CalculateColor(fs_in.vertexTextureCoordinates,fs_in.vertexPositionWS.z, normal.z), 1);
-	color = vec4(normal,1);
+	//color = vec4(normal,1);
 	color = vec4(fs_in.color,1);
 	//color = vec4(0,1,1,1);
 	//color = vec4(fs_in.vertexPositionWS.z, fs_in.vertexPositionWS.z, fs_in.vertexPositionWS.z, 1);
