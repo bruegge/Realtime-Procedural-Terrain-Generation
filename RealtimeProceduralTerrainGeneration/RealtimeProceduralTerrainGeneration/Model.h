@@ -9,7 +9,7 @@
 class CModel : public CKeyManager //inherit the keyManager to let this object act on key strokes
 {
 public:
-	CModel(float nTerrainWidth); //usual constructor with generating VAO / VBO / IBO
+	CModel(float nTerrainTextureWidth, float nTerrainGridWidth); //usual constructor with generating VAO / VBO / IBO
 	~CModel();
 
 	void draw(CShader* pShader, CCamera* pCamera); //draw the model with respect to the camera
@@ -36,7 +36,9 @@ public:
 
 private:
 
-	GLfloat m_nTerrainWidth;
+	GLfloat m_nTerrainGridWidth;
+	GLfloat m_nTerrainTextureWidth;
+
 	GLuint m_nCountIBO = 0;
 	GLuint m_nVAO = 0;
 	GLuint m_nVBO = 0;

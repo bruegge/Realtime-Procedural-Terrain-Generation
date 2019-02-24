@@ -1,9 +1,11 @@
 #include "TerrainGenerator.h"
 #include <iostream>
 
-CTerrainGenerator::CTerrainGenerator(unsigned int nWidth)
+CTerrainGenerator::CTerrainGenerator(unsigned int nWidth, unsigned int nGridWidth)
 {
 	m_nWidth = nWidth;
+	m_nGridWidth = nGridWidth;
+
 	//create Textures
 	for (unsigned int i = 0; i < 3; ++i) //0: Heightmap  //1: normalMap //2: 2nd derivative
 	{
@@ -109,32 +111,31 @@ void CTerrainGenerator::ApplyChangesToTextures()
 
 std::pair<std::vector<CModel::SDataVBO>, std::vector<GLuint>> CTerrainGenerator::GenerateMeshData()
 {
-	float fGridWidth = 128;
-	std::vector<CModel::SDataVBO> resultVBO(fGridWidth * fGridWidth);
+	std::vector<CModel::SDataVBO> resultVBO(m_nGridWidth * m_nGridWidth);
 
-	for (unsigned int x = 0; x < fGridWidth; ++x)
+	for (unsigned int x = 0; x < m_nGridWidth; ++x)
 	{
-		for (unsigned int y = 0; y < fGridWidth; ++y)
+		for (unsigned int y = 0; y < m_nGridWidth; ++y)
 		{
 			CModel::SDataVBO sVertex;
-			GLfloat fXPosition = static_cast<GLfloat>(x) / static_cast<GLfloat>(fGridWidth - 1);
-			GLfloat fYPosition = static_cast<GLfloat>(y) / static_cast<GLfloat>(fGridWidth - 1);
+			GLfloat fXPosition = static_cast<GLfloat>(x) / static_cast<GLfloat>(m_nGridWidth - 1);
+			GLfloat fYPosition = static_cast<GLfloat>(y) / static_cast<GLfloat>(m_nGridWidth - 1);
 
 			sVertex.SetData((fXPosition-0.5f)*10.0f, (fYPosition-0.5f)*10.0f, 0, fXPosition, fYPosition, 0, 0, 0);
-			resultVBO[fGridWidth * x + y] = sVertex;
+			resultVBO[m_nGridWidth * x + y] = sVertex;
 		}
 	}
 	
-	std::vector<unsigned int> resultIBO((fGridWidth -1) * (fGridWidth - 1)*4);
+	std::vector<unsigned int> resultIBO((m_nGridWidth -1) * (m_nGridWidth - 1)*4);
 	unsigned int nVectorPosition = 0;
-	for (unsigned int x = 0; x < fGridWidth -1; ++x)
+	for (unsigned int x = 0; x < m_nGridWidth -1; ++x)
 	{
-		for (unsigned int y = 0; y < fGridWidth -1; ++y)
+		for (unsigned int y = 0; y < m_nGridWidth -1; ++y)
 		{
-			resultIBO[nVectorPosition++] = (x + 1) * fGridWidth + y + 1;
-			resultIBO[nVectorPosition++] = (x + 1) * fGridWidth + y;
-			resultIBO[nVectorPosition++] = x * fGridWidth + y + 1;
-			resultIBO[nVectorPosition++] = x * fGridWidth + y;
+			resultIBO[nVectorPosition++] = (x + 1) * m_nGridWidth + y + 1;
+			resultIBO[nVectorPosition++] = (x + 1) * m_nGridWidth + y;
+			resultIBO[nVectorPosition++] = x * m_nGridWidth + y + 1;
+			resultIBO[nVectorPosition++] = x * m_nGridWidth + y;
 		}
 	}
 	std::pair<std::vector<CModel::SDataVBO>, std::vector<unsigned int>> resultTotal;

@@ -16,7 +16,8 @@
 
 int windowWidth = 800;
 int windowHeight = 600;
-unsigned int nTerrainWidth = 256;
+unsigned int nTerrainWidth = 200;
+unsigned int nTerrainGridWidth = 200;
 CModel* pTerrain;
 CShader* pShader;
 CTexture* pTextureGrass;
@@ -31,8 +32,8 @@ void loadContent() //load all objects and fill them
 {
 	srand(time(NULL));
 	//create 100 cubes
-	pTerrain = new CModel(nTerrainWidth);
-	pTerrainGenerator = new CTerrainGenerator(nTerrainWidth);
+	pTerrain = new CModel(nTerrainWidth, nTerrainGridWidth);
+	pTerrainGenerator = new CTerrainGenerator(nTerrainWidth, nTerrainGridWidth);
 	std::pair<std::vector<CModel::SDataVBO>, std::vector<GLuint>> meshData = pTerrainGenerator->GenerateMeshData();
 
 	pTerrain->SetVBOandIBOData(&(meshData.first), &(meshData.second));

@@ -10,15 +10,18 @@ uniform sampler2D textureTerrain;
 in TCS_OUT
 {
 	vec3 vertexPositionWS;
-	vec3 vertexPositionVS;
 	vec2 vertexTextureCoordinates;
+	vec3 vertexNormal;
+	vec3 bezierControlPoints[16];
+	vec3 color;
 } tes_in[];
 
 out TES_OUT 
 {
     vec3 vertexPositionWS;
-	vec3 vertexPositionVS;
 	vec2 vertexTextureCoordinates;
+	vec3 vertexNormal;
+	vec3 color;
 } tes_out;
 
 vec4 Interpolate4D(vec4 p1, vec4 p2, vec4 p3, vec4 p4)
@@ -42,14 +45,62 @@ vec2 Interpolate2D(vec2 p1, vec2 p2, vec2 p3, vec2 p4)
 	return mix(pm1, pm2, gl_TessCoord.y);
 }
 
+float CalculateBernsteinpolynomDegree4(int i, float fT)
+{
+	float fBinomialkoeffizienten[4];
+	fBinomialkoeffizienten[0] = 4.0f;
+	fBinomialkoeffizienten[1] = 6.0f;
+	fBinomialkoeffizienten[2] = 4.0f;
+	fBinomialkoeffizienten[3] = 1.0f;
+
+	return fBinomialkoeffizienten[i-1] * pow(fT,i) * pow(1-fT,4 - i);
+}
+
+vec3 CalculateControllPointHeight()
+{
+	ivec2 vTessCoord = ivec2((vec2(1,1)-gl_TessCoord.yx) * 3.999f);
+	
+	vec3 vPos = tes_in[0].bezierControlPoints[4*vTessCoord.y+vTessCoord.x];
+	
+	tes_out.color = vec3(vTessCoord/2,0);
+	
+	return vPos;	
+}
+
+float CalculateBezierSurfaceHeight()
+{
+	vec2 positionRelative = gl_TessCoord.xy;
+	float fHeight = 0.0f;
+	float xDirection[4];
+	float yDirection[4];
+	for(int i = 0; i<4; ++i)
+	{
+		xDirection[i] = CalculateBernsteinpolynomDegree4(i+1, positionRelative.x);
+		yDirection[i] = CalculateBernsteinpolynomDegree4(i+1, positionRelative.y);
+	}
+	
+	for(int i = 0; i< 4; ++i)
+	{
+		for(int j = 0; j< 4; j++)
+		{
+			fHeight += xDirection[i] * yDirection[j] * tes_in[0].bezierControlPoints[4*j+i].z;
+		}
+	}
+	return fHeight;
+}
+
 void main()
 {
 	tes_out.vertexTextureCoordinates = Interpolate2D(tes_in[0].vertexTextureCoordinates, tes_in[1].vertexTextureCoordinates,tes_in[2].vertexTextureCoordinates,tes_in[3].vertexTextureCoordinates);
 	tes_out.vertexPositionWS = Interpolate3D(tes_in[0].vertexPositionWS, tes_in[1].vertexPositionWS,tes_in[2].vertexPositionWS,tes_in[3].vertexPositionWS);
-	tes_out.vertexPositionVS = Interpolate3D(tes_in[0].vertexPositionVS, tes_in[1].vertexPositionVS,tes_in[2].vertexPositionVS,tes_in[3].vertexPositionVS);
+	tes_out.vertexNormal = Interpolate3D(tes_in[0].vertexNormal, tes_in[1].vertexNormal,tes_in[2].vertexNormal,tes_in[3].vertexNormal);
+	tes_out.color = Interpolate3D(tes_in[0].color, tes_in[1].color, tes_in[2].color,tes_in[3].color);
 	
-	vec4 textureDepth = texture(textureTerrain, tes_out.vertexTextureCoordinates);
-	tes_out.vertexPositionWS.z = textureDepth.x;
+	float textureDepth = texture(textureTerrain, tes_out.vertexTextureCoordinates).x;
 	
+	vec3 tangent = CalculateControllPointHeight();
+	
+	tes_out.vertexPositionWS.z = tangent.z;
+
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(tes_out.vertexPositionWS,1);
 }	

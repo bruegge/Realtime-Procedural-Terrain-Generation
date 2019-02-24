@@ -8,7 +8,7 @@
 class CTerrainGenerator
 {
 public:
-	CTerrainGenerator(unsigned int nWidth);
+	CTerrainGenerator(unsigned int nWidth, unsigned int nGridWidth);
 	~CTerrainGenerator();
 
 	std::pair<std::vector<CModel::SDataVBO>,std::vector<GLuint>> GenerateMeshData();
@@ -38,6 +38,7 @@ private:
 	glm::vec2 Get2ndDerivative(unsigned int x, unsigned int y);
 	glm::vec2 Get2ndDerivativeAccumulated(unsigned int x, unsigned int y);
 	unsigned int m_nWidth;
+	unsigned int m_nGridWidth;
 
 	std::vector<GLfloat> m_vecDataSetHeight;
 	std::vector<GLfloat> m_vecData1stDerivative;

@@ -10,8 +10,9 @@ out vec4 color;
 in TES_OUT 
 {
     vec3 vertexPositionWS;
-	vec3 vertexPositionVS;
     vec2 vertexTextureCoordinates;
+	vec3 vertexNormal;
+	vec3 color;
 } fs_in;  
 
 vec3 LinearInterpolationWithBoundaryCheck(vec3 color0, vec3 color1, float interpolatedValue, float minValue, float maxValue)
@@ -50,9 +51,11 @@ vec3 CalculateColor(vec2 textureCoordinate, float height, float normal)
 
 void main()
 {	
-	vec3 normal = texture(textureTerrainNormal, fs_in.vertexTextureCoordinates).xyz;
-	color = vec4(CalculateColor(fs_in.vertexTextureCoordinates,fs_in.vertexPositionWS.z, normal.z), 1);
-	//color = vec4(normal,1);
+	//vec3 normal = texture(textureTerrainNormal, fs_in.vertexTextureCoordinates).xyz;
+	vec3 normal = fs_in.vertexNormal;
+	//color = vec4(CalculateColor(fs_in.vertexTextureCoordinates,fs_in.vertexPositionWS.z, normal.z), 1);
+	color = vec4(normal,1);
+	color = vec4(fs_in.color,1);
 	//color = vec4(0,1,1,1);
 	//color = vec4(fs_in.vertexPositionWS.z, fs_in.vertexPositionWS.z, fs_in.vertexPositionWS.z, 1);
 }
