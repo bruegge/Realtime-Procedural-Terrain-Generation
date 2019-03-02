@@ -22,6 +22,30 @@
     <Filter Include="Resource Files\Doc">
       <UniqueIdentifier>{9889e6f9-2a8b-4200-9ece-d47314ec5fe3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Textures\Grass">
+      <UniqueIdentifier>{9ea3dc18-3322-47c3-aca0-c83075f02053}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Textures\Leaves">
+      <UniqueIdentifier>{69ea20ff-f43b-4768-861e-af91e7e6bc0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Textures\Litter">
+      <UniqueIdentifier>{b2ba6771-6b70-4de0-943f-7093c69d41be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Textures\Moss">
+      <UniqueIdentifier>{bd146561-4394-4d0b-a46b-2bdcd9e938c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Textures\Mud">
+      <UniqueIdentifier>{742db38f-a307-41f5-a70a-3d86aad9dd7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Textures\Road">
+      <UniqueIdentifier>{e5b0c737-5232-4362-8b0a-a36000a5eace}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Textures\Rock">
+      <UniqueIdentifier>{5c0db8ca-69cf-4683-a4d6-7b4762b5393f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Textures\Snow">
+      <UniqueIdentifier>{90615e00-0184-48ea-95b8-55748795d74d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -122,22 +146,178 @@
     <None Include="..\Shaders\CS_Voronoi.glsl">
       <Filter>Resource Files\Shaders</Filter>
     </None>
+    <None Include="..\Shaders\CS_SetTexturePositions.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\Textures\cliff.bmp">
-      <Filter>Resource Files\Textures</Filter>
+    <Image Include="..\Textures\T_Ground_Grass\T_Ground_Grass_1_BC_R.tga">
+      <Filter>Resource Files\Textures\Grass</Filter>
     </Image>
-    <Image Include="..\Textures\grass.bmp">
-      <Filter>Resource Files\Textures</Filter>
+    <Image Include="..\Textures\T_Ground_Grass\T_Ground_Grass_1_N_H.png">
+      <Filter>Resource Files\Textures\Grass</Filter>
     </Image>
-    <Image Include="..\Textures\mud.bmp">
-      <Filter>Resource Files\Textures</Filter>
+    <Image Include="..\Textures\T_Ground_Grass\T_Ground_Grass_2_BC_R.tga">
+      <Filter>Resource Files\Textures\Grass</Filter>
     </Image>
-    <Image Include="..\Textures\snow.bmp">
-      <Filter>Resource Files\Textures</Filter>
+    <Image Include="..\Textures\T_Ground_Grass\T_Ground_Grass_2_N_H.png">
+      <Filter>Resource Files\Textures\Grass</Filter>
     </Image>
-    <Image Include="..\Textures\testTerrain.bmp">
-      <Filter>Resource Files\Textures</Filter>
+    <Image Include="..\Textures\T_Ground_Grass\T_Ground_Grass_3_BC_R.tga">
+      <Filter>Resource Files\Textures\Grass</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Grass\T_Ground_Grass_3_N_H.png">
+      <Filter>Resource Files\Textures\Grass</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Grass\T_Ground_Grass_4_BC_R.tga">
+      <Filter>Resource Files\Textures\Grass</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Grass\T_Ground_Grass_4_N_H.png">
+      <Filter>Resource Files\Textures\Grass</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Grass_Leaves\T_Ground_Grass_Leaves_1_BC_R.tga">
+      <Filter>Resource Files\Textures\Leaves</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Grass_Leaves\T_Ground_Grass_Leaves_1_N_H.png">
+      <Filter>Resource Files\Textures\Leaves</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Grass_Leaves\T_Ground_Grass_Leaves_2_BC_R.tga">
+      <Filter>Resource Files\Textures\Leaves</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Grass_Leaves\T_Ground_Grass_Leaves_2_N_H.png">
+      <Filter>Resource Files\Textures\Leaves</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Grass_Leaves\T_Ground_Grass_Leaves_3_BC_R.tga">
+      <Filter>Resource Files\Textures\Leaves</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Grass_Leaves\T_Ground_Grass_Leaves_3_N_H.png">
+      <Filter>Resource Files\Textures\Leaves</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Grass_Leaves\T_Ground_Grass_Leaves_4_BC_R.tga">
+      <Filter>Resource Files\Textures\Leaves</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Grass_Leaves\T_Ground_Grass_Leaves_4_N_H.png">
+      <Filter>Resource Files\Textures\Leaves</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Litter\T_Ground_Litter_1_BC_R.tga">
+      <Filter>Resource Files\Textures\Litter</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Litter\T_Ground_Litter_1_N_H.png">
+      <Filter>Resource Files\Textures\Litter</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Litter\T_Ground_Litter_2_BC_R.tga">
+      <Filter>Resource Files\Textures\Litter</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Litter\T_Ground_Litter_2_N_H.png">
+      <Filter>Resource Files\Textures\Litter</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Litter\T_Ground_Litter_3_BC_R.tga">
+      <Filter>Resource Files\Textures\Litter</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Litter\T_Ground_Litter_3_N_H.png">
+      <Filter>Resource Files\Textures\Litter</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Moss\T_Ground_Moss_1_BC_R.tga">
+      <Filter>Resource Files\Textures\Moss</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Moss\T_Ground_Moss_1_N_H.png">
+      <Filter>Resource Files\Textures\Moss</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Mud\T_Ground_Mud_1_BC_R.tga">
+      <Filter>Resource Files\Textures\Mud</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Mud\T_Ground_Mud_1_N_H.png">
+      <Filter>Resource Files\Textures\Mud</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Mud\T_Ground_Mud_2_BC_R.tga">
+      <Filter>Resource Files\Textures\Mud</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Mud\T_Ground_Mud_2_N_H.png">
+      <Filter>Resource Files\Textures\Mud</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Mud\T_Ground_Mud_3_BC_R.tga">
+      <Filter>Resource Files\Textures\Mud</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Mud\T_Ground_Mud_3_N_H.png">
+      <Filter>Resource Files\Textures\Mud</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Mud\T_Ground_Mud_4_BC_R.tga">
+      <Filter>Resource Files\Textures\Mud</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Mud\T_Ground_Mud_4_N_H.png">
+      <Filter>Resource Files\Textures\Mud</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Snow\T_Ground_Snow_1_BC_R.tga">
+      <Filter>Resource Files\Textures\Snow</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Snow\T_Ground_Snow_1_N_H.png">
+      <Filter>Resource Files\Textures\Snow</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_1_BC_R.tga">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_1_N_H.png">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_2_BC_R.tga">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_2_N_H.png">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_3_BC_R.tga">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_3_N_H.png">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_4_BC_R.tga">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_4_N_H.png">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_5_BC_R.tga">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_5_N_H.png">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_6_BC_R.tga">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_6_N_H.png">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_7_BC_R.tga">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_7_N_H.png">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_8_BC_R.tga">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Rock\T_Ground_Rock_8_N_H.png">
+      <Filter>Resource Files\Textures\Rock</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Road_Path\T_Ground_Road_Path_1_BC_R.tga">
+      <Filter>Resource Files\Textures\Road</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Road_Path\T_Ground_Road_Path_1_N_H.png">
+      <Filter>Resource Files\Textures\Road</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Road_Path\T_Ground_Road_Path_2_BC_R.tga">
+      <Filter>Resource Files\Textures\Road</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Road_Path\T_Ground_Road_Path_2_N_H.png">
+      <Filter>Resource Files\Textures\Road</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Road_Path\T_Ground_Road_Path_3_BC_R.tga">
+      <Filter>Resource Files\Textures\Road</Filter>
+    </Image>
+    <Image Include="..\Textures\T_Ground_Road_Path\T_Ground_Road_Path_3_N_H.png">
+      <Filter>Resource Files\Textures\Road</Filter>
     </Image>
   </ItemGroup>
 </Project>

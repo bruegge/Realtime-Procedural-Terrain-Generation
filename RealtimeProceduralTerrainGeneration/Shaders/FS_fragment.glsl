@@ -1,10 +1,11 @@
+#extension GL_EXT_texture_array : enable
 #version 430 core
 uniform sampler2D textureTerrain;
 uniform sampler2D textureTerrainNormal;
 uniform sampler2D textureTerrain2ndDerAcc;
-uniform sampler2D textureGrass;
-uniform sampler2D textureCliff;
-uniform sampler2D textureSnow;
+uniform sampler2DArray textureMaterialColorSpecular;
+uniform sampler2DArray textureMaterialNormalHeight;
+
 out vec4 color;
 
 in TES_OUT 
@@ -13,49 +14,51 @@ in TES_OUT
     vec2 vertexTextureCoordinates;
 	vec3 vertexNormal;
 	vec3 color;
+	vec2 patchTextureCoordinates;
+	flat int[4] materialNumber;
 } fs_in;  
 
-vec3 LinearInterpolationWithBoundaryCheck(vec3 color0, vec3 color1, float interpolatedValue, float minValue, float maxValue)
+vec4 CalculateColor()
 {
-	float interpVal = (interpolatedValue-minValue)/(maxValue - minValue);
-	vec3 result = color0 * (1.0f - interpVal) + color1 * interpVal;
-	 
-	result = interpVal >= 0 ? result : vec3(0,0,0);
-	result = interpVal <= 1 ? result : vec3(0,0,0);
-	return result;
-}
+	float fFactor = 0.50f;
+	float fRadius0 = length(vec2(1,1)-fs_in.patchTextureCoordinates)*fFactor;
+	float fRadius1 = length(vec2(1,0)-fs_in.patchTextureCoordinates)*fFactor;
+	float fRadius2 = length(vec2(0,1)-fs_in.patchTextureCoordinates)*fFactor;
+	float fRadius3 = length(fs_in.patchTextureCoordinates)*fFactor;
 
-vec3 CalculateColor(vec2 textureCoordinate, float height, float normal)
-{
-	float textureScale = 30.0f;
-	float mipmapLevel = textureQueryLod(textureGrass, textureCoordinate*textureScale).x/30.0f;
-   	
-	vec2 texCoord1 = textureCoordinate*textureScale;
-	vec2 texCoord2 = textureCoordinate*textureScale*3.88f;
+	vec4 normalHeight0 = texture(textureMaterialNormalHeight, vec3(fs_in.patchTextureCoordinates,fs_in.materialNumber[0]),0);
+	vec4 normalHeight1 = texture(textureMaterialNormalHeight, vec3(fs_in.patchTextureCoordinates,fs_in.materialNumber[1]),0);
+	vec4 normalHeight2 = texture(textureMaterialNormalHeight, vec3(fs_in.patchTextureCoordinates,fs_in.materialNumber[2]),0);
+	vec4 normalHeight3 = texture(textureMaterialNormalHeight, vec3(fs_in.patchTextureCoordinates,fs_in.materialNumber[3]),0);
 	
-	vec3 Grass = texture(textureGrass, texCoord1, mipmapLevel).xyz;
-	vec3 Cliff = texture(textureCliff, texCoord1, mipmapLevel).xyz;
-	vec3 Snow = texture(textureSnow, texCoord1, mipmapLevel).xyz;
+	float fHeight0 = normalHeight0.a - fRadius0;
+	float fHeight1 = normalHeight1.a - fRadius1;
+	float fHeight2 = normalHeight2.a - fRadius2;
+	float fHeight3 = normalHeight3.a - fRadius3;
 	
-	vec3 colorValue = vec3(0,0,0);
-		
-	float border1 = 0.33f;
-	float border2 = 0.66f;
-		
-	colorValue += LinearInterpolationWithBoundaryCheck(Grass, Cliff, height, 0.0f, border1);
-	colorValue += LinearInterpolationWithBoundaryCheck(Cliff, Snow, height, border1, border2);
-	colorValue += LinearInterpolationWithBoundaryCheck(Snow, Snow, height, border2, 2.0f);
-		
-	return colorValue;
+	int textureNumber1 = fHeight0> fHeight1 ? 0 : 1;
+	int textureNumber2 = fHeight2> fHeight3 ? 2 : 3;
+	float fHeight01 = max(fHeight0, fHeight1);
+	float fHeight23 = max(fHeight2, fHeight3);
+	int textureNumber = fHeight01 > fHeight23 ? textureNumber1 : textureNumber2;
+	
+	vec4 normalHeight = texture(textureMaterialNormalHeight, vec3(fs_in.patchTextureCoordinates,fs_in.materialNumber[textureNumber]),0);
+	vec4 colorSpecular = texture(textureMaterialColorSpecular, vec3(fs_in.patchTextureCoordinates,fs_in.materialNumber[textureNumber]),0);
+
+	normalHeight.xyz = normalize(normalHeight.xyz * 2.0f - 1.0f);
+	return colorSpecular; 
 }
 
 void main()
 {	
 	//vec3 normal = texture(textureTerrainNormal, fs_in.vertexTextureCoordinates).xyz;
-	vec3 normal = fs_in.vertexNormal;
-	//color = vec4(CalculateColor(fs_in.vertexTextureCoordinates,fs_in.vertexPositionWS.z, normal.z), 1);
+	//vec2 secondDerivative = texture(textureTerrain2ndDerAcc, fs_in.vertexTextureCoordinates).zw;
+	//vec3 normal = fs_in.vertexNormal;
+	//normal = normalize(normal * 2.0 - 1.0);
+	color = CalculateColor();
 	//color = vec4(normal,1);
-	color = vec4(fs_in.color,1);
+	//color = vec4(abs(secondDerivative*10.0f),0,1);
+	//color = vec4(fs_in.color,1);
 	//color = vec4(0,1,1,1);
 	//color = vec4(fs_in.vertexPositionWS.z, fs_in.vertexPositionWS.z, fs_in.vertexPositionWS.z, 1);
 }

@@ -60,18 +60,6 @@ bool CGLFWWindow::IO()
 	tpLastTime = end;
 	double dTimeDiff = diff.count();
 
-	if(glfwGetKey(m_pWindow, GLFW_KEY_1) == GLFW_PRESS)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-
-	if (glfwGetKey(m_pWindow, GLFW_KEY_2) == GLFW_PRESS)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
-
-
-
 	for (int i = 0; i < 400; ++i) // check all keys if they're pressed
 	{
 		checkKey(i, dTimeDiff);

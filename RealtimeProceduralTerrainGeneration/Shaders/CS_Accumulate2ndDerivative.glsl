@@ -3,7 +3,7 @@
 layout (local_size_x = 1, local_size_y = 1) in;
 layout (binding = 0, r32f) uniform image2D terrainHeight;
 layout (binding = 1, rgba32f) uniform image2D terrainNormal;
-layout (binding = 2, rg32f) uniform image2D terrain2ndDerivative;
+layout (binding = 2, rgba32f) uniform image2D terrain2ndDerivative;
 
 uniform float direction;
 uniform float fWidth;
@@ -18,7 +18,7 @@ void iterationX()
 	{
 		vec4 vValue = imageLoad(terrain2ndDerivative,pixelPosition);
 		fSum += vValue.y;
-		vValue = vec4(vValue.x, fSum, 0 ,0);
+		vValue = vec4(vValue.x, fSum, vValue.zw);
 		imageStore(terrain2ndDerivative,pixelPosition,vValue);
 		pixelPosition += ivec2(1,0);
 	}
@@ -32,7 +32,7 @@ void iterationY()
 	{
 		vec4 vValue = imageLoad(terrain2ndDerivative,pixelPosition);
 		fSum += vValue.x;
-		vValue = vec4(fSum, vValue.y, 0, 0);
+		vValue = vec4(fSum, vValue.y, vValue.zw);
 		imageStore(terrain2ndDerivative,pixelPosition,vValue);
 		pixelPosition += ivec2(0,1);
 	}

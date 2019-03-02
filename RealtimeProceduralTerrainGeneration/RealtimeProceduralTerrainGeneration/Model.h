@@ -34,10 +34,18 @@ public:
 	void SetVBOandIBOData(std::vector<SDataVBO>* pvVBO, std::vector<GLuint>* pvIBO);
 	void CreateCube(); //method to fill the VBO / IBO
 
+	void EnableTessellation(float bEnable);
+	void EnableBezierSurface(float bEnable);
+	void EnableWireFrame(float bEnable);
+
 private:
 
 	GLfloat m_nTerrainGridWidth;
 	GLfloat m_nTerrainTextureWidth;
+	float m_fEnableTessellation;
+	float m_fEnableBezierSurface;
+	float m_fEnableWireFrame;
+	GLfloat m_vecRandomNumbers[1000];
 
 	GLuint m_nCountIBO = 0;
 	GLuint m_nVAO = 0;

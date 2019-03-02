@@ -7,12 +7,13 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform sampler2D textureTerrain;
 
+uniform float fEnableBezierSurface;
+
 in TCS_OUT
 {
 	vec3 vertexPositionWS;
 	vec2 vertexTextureCoordinates;
 	vec3 vertexNormal;
-	vec3 bezierControlPoints[16];
 	vec3 color;
 } tes_in[];
 
@@ -22,7 +23,13 @@ out TES_OUT
 	vec2 vertexTextureCoordinates;
 	vec3 vertexNormal;
 	vec3 color;
+	vec2 patchTextureCoordinates;
+	flat int[4] materialNumber;
 } tes_out;
+
+patch in vec4 bezierControlPoints[16];
+patch in float isPatchTessellated;
+patch in flat int[4] materialNumber;
 
 vec4 Interpolate4D(vec4 p1, vec4 p2, vec4 p3, vec4 p4)
 {
@@ -45,7 +52,7 @@ vec2 Interpolate2D(vec2 p1, vec2 p2, vec2 p3, vec2 p4)
 	return mix(pm1, pm2, gl_TessCoord.y);
 }
 
-float CalculateBernsteinpolynomDegree4(int i, float fT)
+float CalculateBernsteinpolynomDegree3(int i, float fT)
 {
 	float fBinomialkoeffizienten[4];
 	fBinomialkoeffizienten[0] = 1.0f;
@@ -64,18 +71,20 @@ float CalculateBezierSurfaceHeight()
 	float yDirection[4];
 	for(int i = 0; i<4; ++i)
 	{
-		xDirection[i] = CalculateBernsteinpolynomDegree4(i, positionRelative.x);
-		yDirection[i] = CalculateBernsteinpolynomDegree4(i, positionRelative.y);
+		xDirection[i] = CalculateBernsteinpolynomDegree3(i, positionRelative.x);
+		yDirection[i] = CalculateBernsteinpolynomDegree3(i, positionRelative.y);
 	}	
 
 	for(int i = 0; i< 4; ++i)
 	{
 		for(int j = 0; j< 4; j++)
 		{
-			fHeight += xDirection[i] * yDirection[j] * tes_in[0].bezierControlPoints[4*j+i].z;
+			fHeight += xDirection[i] * yDirection[j] * bezierControlPoints[4*j+i].z;
 		}
 	}
+	
 	return fHeight;
+	
 }
 
 void main()
@@ -85,10 +94,17 @@ void main()
 	tes_out.vertexNormal = Interpolate3D(tes_in[0].vertexNormal, tes_in[1].vertexNormal,tes_in[2].vertexNormal,tes_in[3].vertexNormal);
 	tes_out.color = Interpolate3D(tes_in[0].color, tes_in[1].color, tes_in[2].color,tes_in[3].color);
 	
-	float fHeight = CalculateBezierSurfaceHeight();
-	tes_out.vertexPositionWS.z = fHeight;
-
-	tes_out.color = tes_out.vertexNormal;
-
+	if(fEnableBezierSurface!=0)
+	{
+		if(isPatchTessellated != 0)
+		{
+			tes_out.vertexPositionWS.z = CalculateBezierSurfaceHeight();
+		}
+	}
+	for(int i = 0; i < 4; ++i)
+	{
+		tes_out.materialNumber[i] = materialNumber[i];
+	}
+	tes_out.patchTextureCoordinates = vec2(1,1)-gl_TessCoord.yx;
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(tes_out.vertexPositionWS,1);
 }	

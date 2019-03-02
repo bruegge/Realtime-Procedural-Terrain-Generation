@@ -2,8 +2,6 @@
 
 layout (local_size_x = 1, local_size_y = 1) in;
 layout (binding = 0, r32f) uniform image2D terrainHeight;
-layout (binding = 1, rgba32f) uniform image2D terrainNormal;
-layout (binding = 2, rg32f) uniform image2D terrain2ndDerivative;
 
 uniform float randomCount;
 uniform float random[100];

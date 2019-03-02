@@ -7,7 +7,7 @@ CTerrainGenerator::CTerrainGenerator(unsigned int nWidth, unsigned int nGridWidt
 	m_nGridWidth = nGridWidth;
 
 	//create Textures
-	for (unsigned int i = 0; i < 3; ++i) //0: Heightmap  //1: normalMap //2: 2nd derivative
+	for (unsigned int i = 0; i < 4; ++i) //0: Heightmap  //1: normalMap //2: 2nd derivative
 	{
 		m_vecTextures.push_back(new CTexture());
 	}
@@ -17,10 +17,12 @@ CTerrainGenerator::CTerrainGenerator(unsigned int nWidth, unsigned int nGridWidt
 	m_pShaderNoise = CShader::createComputeShaderProgram("../shaders/CS_Noise.glsl");
 	m_pShaderVoronoi = CShader::createComputeShaderProgram("../shaders/CS_Voronoi.glsl");
 	m_pShaderErosion = CShader::createComputeShaderProgram("../shaders/CS_Erosion.glsl");
+	m_pShaderSetTextures = CShader::createComputeShaderProgram("../shaders/CS_SetTexturePositions.glsl");
 }
 
 CTerrainGenerator::~CTerrainGenerator()
 {
+	delete m_vecTextures[3];
 	delete m_vecTextures[2];
 	delete m_vecTextures[1];
 	delete m_vecTextures[0];
@@ -42,25 +44,32 @@ CTexture* CTerrainGenerator::Get2ndDerivativeMap()
 	return m_vecTextures[2];
 }
 
+CTexture* CTerrainGenerator::GetTerrainTexture()
+{
+	return m_vecTextures[3];
+}
+
 void CTerrainGenerator::GenerateHeightMapCPU(unsigned int nCountVoronoiPoints, unsigned int nErosionSteps)
 {
 	GenerateNoise();
 	GenerateVoronoi(nCountVoronoiPoints);
 	GenerateErosion(nErosionSteps);
-	GenerateDerivatives();
 	ApplyChangesToTextures();
+	GenerateDerivatives();
 }
 
 void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, unsigned int nErosionSteps)
 {
 	m_vecTextures[0]->SetTextureData(m_nWidth, m_nWidth, 1, nullptr, false);
 	m_vecTextures[1]->SetTextureData(m_nWidth, m_nWidth, 4, nullptr, false);
-	m_vecTextures[2]->SetTextureData(m_nWidth, m_nWidth, 2, nullptr, false);
+	m_vecTextures[2]->SetTextureData(m_nWidth, m_nWidth, 4, nullptr, false);
+	m_vecTextures[3]->SetTextureData(m_nWidth, m_nWidth, 1, nullptr, false, false);
 
 
 	glBindImageTexture(0, m_vecTextures[0]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 	glBindImageTexture(1, m_vecTextures[1]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
-	glBindImageTexture(2, m_vecTextures[2]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RG32F);
+	glBindImageTexture(2, m_vecTextures[2]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+	glBindImageTexture(3, m_vecTextures[3]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 
 	GLfloat vecRandomNumbers[100];
 	for (unsigned int i = 0; i< 100; ++i)
@@ -83,30 +92,31 @@ void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, u
 	glUniform1f(glGetUniformLocation(m_pShaderErosion->getID(), "fWidth"), m_nWidth);
 	glDispatchCompute(m_nWidth, m_nWidth, 1);
 
-	m_pShaderNormalAnd2ndDerivative->bind();
-	glUniform1f(glGetUniformLocation(m_pShaderNormalAnd2ndDerivative->getID(), "fWidth"), m_nWidth);
+	GenerateDerivatives();
+
+	glBindImageTexture(0, m_vecTextures[0]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+	glBindImageTexture(1, m_vecTextures[1]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+	glBindImageTexture(2, m_vecTextures[2]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+	glBindImageTexture(3, m_vecTextures[3]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+
+	m_pShaderSetTextures->bind();
+	glUniform1f(glGetUniformLocation(m_pShaderSetTextures->getID(), "randomCount"), 100);
+	glUniform1f(glGetUniformLocation(m_pShaderSetTextures->getID(), "fTextureCount"), 27);
+	nLocationRandomVector = glGetUniformLocation(m_pShaderSetTextures->getID(), "random");
+	glUniform1fv(nLocationRandomVector, 100, vecRandomNumbers);
+
 	glDispatchCompute(m_nWidth, m_nWidth, 1);
-	
-	m_pShaderAccumulate2ndDerivative->bind();
-	glUniform1f(glGetUniformLocation(m_pShaderAccumulate2ndDerivative->getID(), "fWidth"), m_nWidth);
-	glUniform1f(glGetUniformLocation(m_pShaderAccumulate2ndDerivative->getID(), "direction"), 0.0f);
-	glDispatchCompute(m_nWidth, 1, 1);
-	glUniform1f(glGetUniformLocation(m_pShaderAccumulate2ndDerivative->getID(), "direction"), 1.0f);
-	glDispatchCompute(m_nWidth, 1, 1);
 
 	glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 	glBindImageTexture(1, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
-	glBindImageTexture(2, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RG32F);
+	glBindImageTexture(2, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+	glBindImageTexture(3, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 }
 
 void CTerrainGenerator::ApplyChangesToTextures()
 {
 	std::vector<GLfloat>* pTerrainHeight = GetDataHeight();
 	m_vecTextures[0]->SetTextureData(m_nWidth, m_nWidth, 1, pTerrainHeight, false);
-	std::vector<GLfloat>* pTerrainNormal = GetData1stDerivative();
-	m_vecTextures[1]->SetTextureData(m_nWidth, m_nWidth, 4, pTerrainNormal, false);
-	std::vector<GLfloat>* pTerrain2ndDerivative = GetData2ndDerivativeAccumulated();
-	m_vecTextures[2]->SetTextureData(m_nWidth, m_nWidth, 2, pTerrain2ndDerivative, false);
 }
 
 std::pair<std::vector<CModel::SDataVBO>, std::vector<GLuint>> CTerrainGenerator::GenerateMeshData()
@@ -147,21 +157,6 @@ std::pair<std::vector<CModel::SDataVBO>, std::vector<GLuint>> CTerrainGenerator:
 std::vector<GLfloat>* CTerrainGenerator::GetDataHeight()
 {
 	return &m_vecDataSetHeight;
-}
-
-std::vector<GLfloat>* CTerrainGenerator::GetData1stDerivative()
-{
-	return &m_vecData1stDerivative;
-}
-
-std::vector<GLfloat>* CTerrainGenerator::GetData2ndDerivative()
-{
-	return &m_vecData2ndDerivative;
-}
-
-std::vector<GLfloat>* CTerrainGenerator::GetData2ndDerivativeAccumulated()
-{
-	return &m_vecData2ndDerivativeAccumulated;
 }
 
 void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
@@ -216,46 +211,179 @@ void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
 
 void CTerrainGenerator::GenerateErosion(unsigned int nSteps)
 {
+	float di[3][3];
+	float hi[3][3];
+	float c = 0.5f;
+	float N = m_nWidth;
+	float T = 4.0f / N;
+	
+	for (int step = 0; step < nSteps; ++step);
+	{
 
+		int indexXDmax = 0;
+		int indexYDmax = 0;
+		float dTotal = 0;
+
+		for (int i = 1; i < m_nWidth-1; ++i)
+		{
+			for (int j = 1; j < m_nWidth-1; ++j)
+			{
+				//calculate neighborhoodHeights
+				float h = GetTerrainHeight(i, j);
+				for (int x = 0; x < 3; ++x)
+				{
+					for (int y = 0; y < 3; ++y)
+					{
+						hi[x][y] = GetTerrainHeight(i + (x - 1), j + (y - 1));
+						di[x][y] = h - GetTerrainHeight(i + (x - 1), j + (y - 1));
+
+						if (hi[x][y] > hi[indexXDmax][indexYDmax])
+						{
+							indexXDmax = x;
+							indexYDmax = y;
+						}
+						if (di[x][y] > T)
+						{
+							dTotal += di[x][y];
+						}
+					}
+				}
+
+				for (int x = 0; x < 3; ++x)
+				{
+					for (int y = 0; y < 3; ++y)
+					{
+						hi[x][y] = hi[x][y] + c * (hi[indexXDmax][indexYDmax] - T) * di[x][y] / dTotal;
+						m_vecDataSetHeight[((i + x - 1)*m_nWidth + (j + y - 1))] = hi[x][y];
+					}
+				}
+
+				
+			}
+		}
+	}
+	//GenerateErosion2(nSteps);
 }
+
+void CTerrainGenerator::GenerateErosion2(unsigned int nSteps)
+{
+	float* W = new float[m_nWidth * m_nWidth];
+	float* M = new float[m_nWidth * m_nWidth];
+	float Ke = 0.5f;
+	float Kc = 0.01f;
+	float Kr = 0.01f;
+	float Ks = 0.01f;
+	float a = 0;
+
+	for (int i = 0; i < m_nWidth; i++)
+	{
+		for (int j = 0; j < m_nWidth; j++)
+		{
+			W[i *m_nWidth + j] = 0;
+			M[i *m_nWidth + j] = 0;
+		}
+	}
+
+	for (int step = 0; step < nSteps; ++step)
+	{
+
+		for (int i = 0; i < m_nWidth; i++)
+		{
+			for (int j = 0; j < m_nWidth; j++)
+			{
+				W[i *m_nWidth + j] += Kr;
+				M[i *m_nWidth + j] += Ks*W[i *m_nWidth + j];
+				m_vecDataSetHeight[i *m_nWidth + j] -= Ks * W[i *m_nWidth + j];
+				if (m_vecDataSetHeight[i *m_nWidth + j] > 10)
+				{
+					int muh = 0;
+					muh++;
+				}
+			}
+		}
+
+		for (int i = 1; i < m_nWidth - 1; i++)
+		{
+			for (int j = 1; j < m_nWidth - 1; j++)
+			{
+				float ai = 0;
+				float di = 0;
+				float aEverage = 0;
+				float dTotal = 0.0;
+
+				float a = m_vecDataSetHeight[i *m_nWidth + j] + W[i *m_nWidth +j];
+				int countPositives = 0;
+				for (int x = 0; x < 3; x++)
+				{
+					for (int y = 0; y < 3; y++)
+					{
+						aEverage += (W[(i + x - 1) *m_nWidth + (j + y - 1)] + m_vecDataSetHeight[(i + x - 1) *m_nWidth + (j + y - 1)]) / 9.0f;
+						float ai = m_vecDataSetHeight[(i + x - 1) *m_nWidth + (j + y - 1)] + W[(i + x - 1) *m_nWidth + (j + y - 1)];
+						float di = a - ai;
+						if (di > 0)
+						{
+							countPositives++;
+							dTotal += di;
+						}
+						if (x == 2 && y == 2 && dTotal == 0.0f)
+						{
+							int muh = 0; 
+							muh++;
+						}
+					}
+				}
+
+				float deltaA = a - aEverage;
+
+				for (int x = 0; x < 3; x++)
+				{
+					for (int y = 0; y < 3; y++)
+					{
+						float ai = m_vecDataSetHeight[(i + x - 1) *m_nWidth + (j + y - 1)] + W[(i + x - 1) *m_nWidth + (j + y - 1)];;
+						float di = a - ai;
+
+						float deltaW = 0;
+						if (dTotal != 0)
+						{
+							deltaW = std::fminf(W[i *m_nWidth + j], deltaA) * di / dTotal;
+						}
+						else
+						{
+							int muh = 0; 
+							muh++;
+						}
+
+						if (W[i *m_nWidth + j] != 0)
+						{
+							M[(i + x - 1) *m_nWidth + (j + y - 1)] += M[i*m_nWidth + j] * deltaW / W[i *m_nWidth + j];
+						}
+						
+					}
+				}
+
+				W[i*m_nWidth + j] *= (1 - Ke);
+				float mMax = Kc * W[i*m_nWidth + j];
+				float deltaM = std::fmax(0, M[i*m_nWidth + j] - mMax);
+				M[i*m_nWidth + j] -= deltaM;
+				m_vecDataSetHeight[i*m_nWidth + j] += deltaM;
+				if (m_vecDataSetHeight[i *m_nWidth + j] > 10)
+				{
+					int muh = 0;
+					muh++;
+				}
+			}
+		}
+	}
+	delete[] W;
+	delete[] M;
+}
+
 
 float CTerrainGenerator::GetTerrainHeight(unsigned int x, unsigned int y)
 {
 	x = std::fmin(std::fmax(0, x), m_nWidth - 1);
 	y = std::fmin(std::fmax(0, y), m_nWidth - 1);
 	return m_vecDataSetHeight[(x*m_nWidth + y)];
-}
-
-glm::vec4 CTerrainGenerator::Get1stDerivative(unsigned int x, unsigned int y)
-{
-	x = std::fmin(std::fmax(0, x), m_nWidth - 1);
-	y = std::fmin(std::fmax(0, y), m_nWidth - 1);
-	float f1 = m_vecData1stDerivative[(x*m_nWidth + y) * 4 + 0];
-	float f2 = m_vecData1stDerivative[(x*m_nWidth + y) * 4 + 1];
-	float f3 = m_vecData1stDerivative[(x*m_nWidth + y) * 4 + 2];
-	float f4 = m_vecData1stDerivative[(x*m_nWidth + y) * 4 + 3];
-
-	return glm::vec4(f1, f2, f3, f4);
-}
-
-glm::vec2 CTerrainGenerator::Get2ndDerivative(unsigned int x, unsigned int y)
-{
-	x = std::fmin(std::fmax(0, x), m_nWidth - 1);
-	y = std::fmin(std::fmax(0, y), m_nWidth - 1);
-	float f1 = m_vecData2ndDerivative[(x*m_nWidth + y) * 2 + 0];
-	float f2 = m_vecData2ndDerivative[(x*m_nWidth + y) * 2 + 1];
-
-	return glm::vec2(f1, f2);
-}
-
-glm::vec2 CTerrainGenerator::Get2ndDerivativeAccumulated(unsigned int x, unsigned int y)
-{
-	x = std::fmin(std::fmax(0, x), m_nWidth - 1);
-	y = std::fmin(std::fmax(0, y), m_nWidth - 1);
-	float f1 = m_vecData2ndDerivativeAccumulated[(x*m_nWidth + y) * 2 + 0];
-	float f2 = m_vecData2ndDerivativeAccumulated[(x*m_nWidth + y) * 2 + 1];
-	
-	return glm::vec2(f1, f2);
 }
 
 void CTerrainGenerator::GenerateNoise()
@@ -282,65 +410,25 @@ void CTerrainGenerator::GenerateNoise()
 
 void CTerrainGenerator::GenerateDerivatives()
 {
-	m_vecData1stDerivative.resize(m_nWidth*m_nWidth * 4);
-	m_vecData2ndDerivative.resize(m_nWidth*m_nWidth * 2);
-	m_vecData2ndDerivativeAccumulated.resize(m_nWidth*m_nWidth * 2);
-	float fPixelDistance = 10.0f / m_nWidth * 2.0f;
-	//derivative 1st order
-	for (unsigned int x = 0; x < m_nWidth; ++x)
-	{
-		for (unsigned int y = 0; y < m_nWidth; ++y)
-		{
-			float fHeightX_1 = GetTerrainHeight(x - 1, y);
-			float fHeightX1 = GetTerrainHeight(x + 1, y);
-			float fHeightY_1 = GetTerrainHeight(x, y - 1);
-			float fHeightY1 = GetTerrainHeight(x, y + 1);
 
-			float fZInXDir = (fHeightX1 - fHeightX_1);
-			float fZInYDir = (fHeightY1 - fHeightY_1);
-			glm::vec3 vXDir = glm::vec3(fPixelDistance, 0, fZInYDir);
-			glm::vec3 vYDir = glm::vec3(0, fPixelDistance, fZInXDir);
-			glm::vec3 vNormal = glm::normalize(glm::cross(vXDir, vYDir));
+	glBindImageTexture(0, m_vecTextures[0]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+	glBindImageTexture(1, m_vecTextures[1]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+	glBindImageTexture(2, m_vecTextures[2]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
 
-			m_vecData1stDerivative[(x*m_nWidth + y) * 4 + 0] = vNormal.x;
-			m_vecData1stDerivative[(x*m_nWidth + y) * 4 + 1] = vNormal.y;
-			m_vecData1stDerivative[(x*m_nWidth + y) * 4 + 2] = vNormal.z;
-			m_vecData1stDerivative[(x*m_nWidth + y) * 4 + 3] = 0;
-		}
-	}
-	//derivative 2nd order
-	for (unsigned int x = 0; x < m_nWidth; ++x)
-	{
-		for (unsigned int y = 0; y < m_nWidth; ++y)
-		{
-			float fHeightX_1 = GetTerrainHeight(x - 1, y);
-			float fHeightX0 = GetTerrainHeight(x, y);
-			float fHeightX1 = GetTerrainHeight(x + 1, y);
-				  
-			float fHeightY_1 = GetTerrainHeight(x, y - 1);
-			float fHeightY0 = GetTerrainHeight(x, y);
-			float fHeightY1 = GetTerrainHeight(x, y + 1);
+	m_pShaderNormalAnd2ndDerivative->bind();
+	glUniform1f(glGetUniformLocation(m_pShaderNormalAnd2ndDerivative->getID(), "fWidth"), m_nWidth);
+	glDispatchCompute(m_nWidth, m_nWidth, 1);
 
-			float xDir = (fHeightX_1 - 2 * fHeightX0 + fHeightX1);
-			float yDir = (fHeightY_1 - 2 * fHeightY0 + fHeightY1);
+	m_pShaderAccumulate2ndDerivative->bind();
+	glUniform1f(glGetUniformLocation(m_pShaderAccumulate2ndDerivative->getID(), "fWidth"), m_nWidth);
+	glUniform1f(glGetUniformLocation(m_pShaderAccumulate2ndDerivative->getID(), "direction"), 0.0f);
+	glDispatchCompute(m_nWidth, 1, 1);
+	glUniform1f(glGetUniformLocation(m_pShaderAccumulate2ndDerivative->getID(), "direction"), 1.0f);
+	glDispatchCompute(m_nWidth, 1, 1);
 
-			m_vecData2ndDerivative[(x*m_nWidth + y) * 2 + 0] = xDir;
-			m_vecData2ndDerivative[(x*m_nWidth + y) * 2 + 1] = yDir;
-		}
-	}
-	//accumulate the 2nd derivative
-	for (unsigned int x = 0; x < m_nWidth; ++x)
-	{
-		for (unsigned int y = 0; y < m_nWidth; ++y)
-		{
-			glm::vec2 derivative2nd = Get2ndDerivative(x, y);
-			glm::vec2 derivative2ndX_1Acc = Get2ndDerivativeAccumulated(x - 1, y);
-			glm::vec2 derivative2ndY_1Acc = Get2ndDerivativeAccumulated(x, y - 1);
-
-			m_vecData2ndDerivativeAccumulated[(x*m_nWidth + y) * 2 + 0] = derivative2ndX_1Acc.x + abs(derivative2nd.x);
-			m_vecData2ndDerivativeAccumulated[(x*m_nWidth + y) * 2 + 1] = derivative2ndY_1Acc.y + abs(derivative2nd.y);
-		}
-	}
+	glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+	glBindImageTexture(1, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+	glBindImageTexture(2, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
 }
 
 unsigned int CTerrainGenerator::GetWidth()

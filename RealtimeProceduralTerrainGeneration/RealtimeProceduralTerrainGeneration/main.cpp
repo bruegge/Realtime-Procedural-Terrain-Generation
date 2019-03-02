@@ -17,12 +17,10 @@
 int windowWidth = 800;
 int windowHeight = 600;
 unsigned int nTerrainWidth = 256;
-unsigned int nTerrainGridWidth = 128;
+unsigned int nTerrainGridWidth = 256;
 CModel* pTerrain;
 CShader* pShader;
-CTexture* pTextureGrass;
-CTexture* pTextureSnow;
-CTexture* pTextureCliff;
+CTexture* pTextureMaterial;
 
 CCamera* pCamera;
 CTerrainGenerator* pTerrainGenerator;
@@ -38,7 +36,7 @@ void loadContent() //load all objects and fill them
 
 	pTerrain->SetVBOandIBOData(&(meshData.first), &(meshData.second));
 	//create camera
-	pCamera = new CCamera(90, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 1000.0f, glm::vec3(0, 0, 7), glm::vec3(0, 0, -10), glm::vec3(0, 1, 0));
+	pCamera = new CCamera(90, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.01f, 1000.0f, glm::vec3(0, 0, 7), glm::vec3(0, 0, -10), glm::vec3(0, 1, 0));
 	//create shader program
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 	pShader = CShader::createShaderProgram("../shaders/VS_vertex.glsl", 
@@ -47,9 +45,10 @@ void loadContent() //load all objects and fill them
 											nullptr, 
 											"../shaders/FS_fragment.glsl");
 	//create and load texture
-	pTextureGrass = new CTexture("../textures/grass.bmp");
-	pTextureCliff = new CTexture("../textures/cliff.bmp");
-	pTextureSnow = new CTexture("../textures/snow.bmp");
+
+
+	pTextureMaterial = new CTexture();	
+	pTextureMaterial->LoadMaterials();
 
 	//bind keys to the objects operations
 	pCamera->AddMouseAxisBinding(CKeyManager::EMouseAxis::XAxis, std::bind(&CCamera::TurnX, pCamera, std::placeholders::_1));
@@ -59,6 +58,12 @@ void loadContent() //load all objects and fill them
 	pCamera->AddKeyBinding(GLFW_KEY_S, std::bind(&CCamera::Backward, pCamera, std::placeholders::_1));
 	pCamera->AddKeyBinding(GLFW_KEY_A, std::bind(&CCamera::TurnX, pCamera, -1));
 	pCamera->AddKeyBinding(GLFW_KEY_D, std::bind(&CCamera::TurnX, pCamera, 1));
+	pTerrain->AddKeyBinding(GLFW_KEY_1, std::bind(&CModel::EnableWireFrame, pTerrain, 1));
+	pTerrain->AddKeyBinding(GLFW_KEY_2, std::bind(&CModel::EnableWireFrame, pTerrain, 0));
+	pTerrain->AddKeyBinding(GLFW_KEY_9, std::bind(&CModel::EnableTessellation, pTerrain, 1));
+	pTerrain->AddKeyBinding(GLFW_KEY_O, std::bind(&CModel::EnableTessellation, pTerrain, 0));
+	pTerrain->AddKeyBinding(GLFW_KEY_0, std::bind(&CModel::EnableBezierSurface, pTerrain, 1));
+	pTerrain->AddKeyBinding(GLFW_KEY_P, std::bind(&CModel::EnableBezierSurface, pTerrain, 0));
 
 	std::cout << "Content loaded" << std::endl;
 }
@@ -87,23 +92,23 @@ void programLoop(CGLFWWindow* window)
 		{
 			pTerrainGenerator->GenerateHeightMapGPU(7, 50);
 		}
+		
+
 	
 		pShader->bind();
 		
 		pTerrainGenerator->GetHeightMap()->Link(pShader, 0, "textureTerrain");
 		pTerrainGenerator->GetNormalMap()->Link(pShader, 1, "textureTerrainNormal");
 		pTerrainGenerator->Get2ndDerivativeMap()->Link(pShader, 2, "textureTerrain2ndDerAcc");
-		pTextureGrass->Link(pShader, 3, "textureGrass");
-		pTextureCliff->Link(pShader, 4, "textureCliff");
-		pTextureSnow->Link(pShader, 5, "textureSnow");
-
+		pTerrainGenerator->GetTerrainTexture()->Link(pShader, 3, "textureTerrainTexture");
+		pTextureMaterial->LinkMaterial(pShader, 4, 5, "textureMaterialColorSpecular", "textureMaterialNormalHeight");
+		
 		pTerrainGenerator->GetHeightMap()->Bind(0);
 		pTerrainGenerator->GetNormalMap()->Bind(1);
 		pTerrainGenerator->Get2ndDerivativeMap()->Bind(2);
-		pTextureGrass->Bind(3); 
-		pTextureCliff->Bind(4);
-		pTextureSnow->Bind(5);
-
+		pTerrainGenerator->GetTerrainTexture()->Bind(3);
+		pTextureMaterial->BindMaterial(4, 5);
+		
 		//draw terrain	
 		pTerrain->draw(pShader, pCamera); //draws the triangle with the given shader
 	
@@ -124,9 +129,7 @@ void deleteContent() //delete the objects
 	delete pTerrain;
 	delete pTerrainGenerator;
 	delete pShader;
-	delete pTextureCliff;
-	delete pTextureGrass;
-	delete pTextureSnow;
+	delete pTextureMaterial;
 	delete pCamera;
 }
 

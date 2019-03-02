@@ -3,7 +3,7 @@
 layout (local_size_x = 1, local_size_y = 1) in;
 layout (binding = 0, r32f) uniform image2D terrainHeight;
 layout (binding = 1, rgba32f) uniform image2D terrainNormal;
-layout (binding = 2, rg32f) uniform image2D terrain2ndDerivative;
+layout (binding = 2, rgba32f) uniform image2D terrain2ndDerivative;
 
 uniform float fWidth;
 
@@ -23,7 +23,12 @@ void main(void)
 	float fZInYDir = (vHeightY1.x - vHeightY_1.x);
 	vec3 vXDir = vec3(fPixelDistance, 0, fZInXDir);
 	vec3 vYDir = vec3(0, fPixelDistance, fZInYDir);
+
 	vec3 vNormal = normalize(cross(vXDir, vYDir));
+
+
+
+
 
 	imageStore(terrainNormal,pixelPosition,vec4(vNormal.x,vNormal.y,vNormal.z,0));
 
@@ -31,6 +36,6 @@ void main(void)
 	float xDir = (vHeightX_1.x - 2 * vPos.x + vHeightX1.x);
 	float yDir = (vHeightY_1.x - 2 * vPos.x + vHeightY1.x);
 
-	imageStore(terrain2ndDerivative,pixelPosition,vec4(yDir,xDir,0,0));
+	imageStore(terrain2ndDerivative,pixelPosition,vec4(yDir,xDir,yDir,xDir));
 
 }

@@ -17,6 +17,10 @@ CModel::CModel(float nTerrainTextureWidth, float nTerrainGridWidth)
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 5)); //color
 	glBindVertexArray(0); //unbind
+	for (unsigned int i = 0; i< 1000; ++i)
+	{
+		m_vecRandomNumbers[i] = rand();
+	}
 }
 
 CModel::~CModel()
@@ -24,6 +28,24 @@ CModel::~CModel()
 	glDeleteBuffers(1, &m_nVBO);
 	glDeleteBuffers(1, &m_nIBO);
 	glDeleteVertexArrays(1, &m_nVAO);
+}
+
+void CModel::EnableTessellation(float fEnable)
+{
+	m_fEnableTessellation = fEnable;
+}
+
+void CModel::EnableBezierSurface(float fEnable)
+{
+	m_fEnableBezierSurface = fEnable;
+}
+
+void CModel::EnableWireFrame(float fEnable)
+{
+	if(fEnable)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void CModel::SetVBOandIBOData(std::vector<SDataVBO>* pvVBO, std::vector<GLuint>* pvIBO)
@@ -119,15 +141,26 @@ void CModel::draw(CShader* pShader, CCamera* pCamera)
 {
 	pShader->bind();
 	glBindVertexArray(m_nVAO); //bind the VAO including VBO, IBO ...
+	
 	GLint uniformLocationModelMatrix = glGetUniformLocation(pShader->getID(), "modelMatrix");
 	GLint uniformLocationViewMatrix = glGetUniformLocation(pShader->getID(), "viewMatrix");
 	GLint uniformLocationProjectionMatrix = glGetUniformLocation(pShader->getID(), "projectionMatrix");
 	GLint uniformLocationCameraPosition = glGetUniformLocation(pShader->getID(), "cameraPosition");
 	GLint uniformLocationTerrainGridWidth = glGetUniformLocation(pShader->getID(), "fGridWidth");
 	GLint uniformLocationTerrainTextureWidth = glGetUniformLocation(pShader->getID(), "fTextureWidth");
+	GLint uniformLocationEnableTessellation = glGetUniformLocation(pShader->getID(), "fEnableTessellation");
+	GLint uniformLocationEnableBezier = glGetUniformLocation(pShader->getID(), "fEnableBezierSurface");
+	GLint uniformLocationRandomCount = glGetUniformLocation(pShader->getID(), "randomCount");
+	GLint uniformLocationRandomVector = glGetUniformLocation(pShader->getID(), "random");
+	GLint uniformLocationMaterialCount = glGetUniformLocation(pShader->getID(), "numberMaterials");
 
 	glm::vec3 cameraPosition = pCamera->GetPosition();
 	
+	glUniform1i(uniformLocationMaterialCount, 27);
+	glUniform1i(uniformLocationRandomCount, 1000);
+	glUniform1fv(uniformLocationRandomVector, 1000, m_vecRandomNumbers);
+	glUniform1f(uniformLocationEnableTessellation, m_fEnableTessellation);
+	glUniform1f(uniformLocationEnableBezier, m_fEnableBezierSurface);
 	glUniform1f(uniformLocationTerrainGridWidth, m_nTerrainGridWidth - 1);
 	glUniform1f(uniformLocationTerrainTextureWidth, m_nTerrainTextureWidth);
 	glUniform3f(uniformLocationCameraPosition, cameraPosition.x, cameraPosition.y, cameraPosition.z);
