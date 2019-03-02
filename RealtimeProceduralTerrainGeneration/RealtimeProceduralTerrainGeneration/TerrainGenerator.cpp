@@ -56,6 +56,7 @@ void CTerrainGenerator::GenerateHeightMapCPU(unsigned int nCountVoronoiPoints, u
 	GenerateErosion(nErosionSteps);
 	ApplyChangesToTextures();
 	GenerateDerivatives();
+	GenerateTextureDistribution();
 }
 
 void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, unsigned int nErosionSteps)
@@ -94,6 +95,22 @@ void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, u
 
 	GenerateDerivatives();
 
+	GenerateTextureDistribution();
+
+	glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+	glBindImageTexture(1, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+	glBindImageTexture(2, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+	glBindImageTexture(3, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+}
+
+void CTerrainGenerator::GenerateTextureDistribution()
+{
+	GLfloat vecRandomNumbers[100];
+	for (unsigned int i = 0; i< 100; ++i)
+	{
+		vecRandomNumbers[i] = rand() % m_nWidth;
+	}
+
 	glBindImageTexture(0, m_vecTextures[0]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 	glBindImageTexture(1, m_vecTextures[1]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
 	glBindImageTexture(2, m_vecTextures[2]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
@@ -102,15 +119,10 @@ void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, u
 	m_pShaderSetTextures->bind();
 	glUniform1f(glGetUniformLocation(m_pShaderSetTextures->getID(), "randomCount"), 100);
 	glUniform1f(glGetUniformLocation(m_pShaderSetTextures->getID(), "fTextureCount"), 27);
-	nLocationRandomVector = glGetUniformLocation(m_pShaderSetTextures->getID(), "random");
+	GLuint nLocationRandomVector = glGetUniformLocation(m_pShaderSetTextures->getID(), "random");
 	glUniform1fv(nLocationRandomVector, 100, vecRandomNumbers);
 
 	glDispatchCompute(m_nWidth, m_nWidth, 1);
-
-	glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
-	glBindImageTexture(1, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
-	glBindImageTexture(2, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
-	glBindImageTexture(3, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 }
 
 void CTerrainGenerator::ApplyChangesToTextures()
@@ -204,7 +216,7 @@ void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
 					fDistance2ndClosest = fDistance;
 				}
 			}
-			m_vecDataSetHeight[(x*m_nWidth + y)] = (-fDistance1stClosest +fDistance2ndClosest);
+			m_vecDataSetHeight[(x*m_nWidth + y)] *= (-fDistance1stClosest +fDistance2ndClosest);
 		}
 	}
 }
@@ -217,7 +229,7 @@ void CTerrainGenerator::GenerateErosion(unsigned int nSteps)
 	float N = m_nWidth;
 	float T = 4.0f / N;
 	
-	for (int step = 0; step < nSteps; ++step);
+	for (int step = 0; step < 100; ++step);
 	{
 
 		int indexXDmax = 0;

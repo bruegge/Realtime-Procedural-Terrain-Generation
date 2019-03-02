@@ -31,6 +31,7 @@ private:
 	void GenerateErosion2(unsigned int nSteps);
 	void GenerateNoise();
 	void GenerateDerivatives();
+	void GenerateTextureDistribution();
 
 	float GetTerrainHeight(unsigned int x, unsigned int y);
 	unsigned int m_nWidth;

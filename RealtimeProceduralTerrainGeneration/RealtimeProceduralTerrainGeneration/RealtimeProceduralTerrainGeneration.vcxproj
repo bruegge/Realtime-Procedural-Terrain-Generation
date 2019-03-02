@@ -120,7 +120,6 @@
   <ItemGroup>
     <ClCompile Include="..\ExternalLibs\src\glad.c" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="FrameBufferObject.cpp" />
     <ClCompile Include="GLFWWindow.cpp" />
     <ClCompile Include="ImageLoader.cpp" />
     <ClCompile Include="KeyManager.cpp" />
@@ -132,7 +131,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="FrameBufferObject.h" />
     <ClInclude Include="GLFWWindow.h" />
     <ClInclude Include="ImageLoader.h" />
     <ClInclude Include="KeyManager.h" />
