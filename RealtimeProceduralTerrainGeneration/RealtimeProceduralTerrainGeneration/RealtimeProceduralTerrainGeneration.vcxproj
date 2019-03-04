@@ -155,6 +155,8 @@
     <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\Doc\example1.png" />
+    <Image Include="..\..\Doc\example2.png" />
     <Image Include="..\Textures\T_Ground_Grass\T_Ground_Grass_1_BC_R.tga" />
     <Image Include="..\Textures\T_Ground_Grass\T_Ground_Grass_1_N_H.png" />
     <Image Include="..\Textures\T_Ground_Grass\T_Ground_Grass_2_BC_R.tga" />

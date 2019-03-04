@@ -446,8 +446,8 @@ void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
 	{
 		for (unsigned int y = 0; y < m_nWidth; ++y)
 		{
-			float shiftX = 20.0f*noise(x / static_cast<float>(m_nWidth) * 20, y / static_cast<float>(m_nWidth) * 20, 0);
-			float shiftY = 20.0f*noise(x / static_cast<float>(m_nWidth) * 20, y / static_cast<float>(m_nWidth) * 20, 10);
+			float shiftX = m_nWidth / 10.0f * noise(x / static_cast<float>(m_nWidth) * 20, y / static_cast<float>(m_nWidth) * 20, 0);
+			float shiftY = m_nWidth / 10.0f * noise(x / static_cast<float>(m_nWidth) * 20, y / static_cast<float>(m_nWidth) * 20, 10);
 
 			glm::vec2 position = glm::vec2(x + shiftX, y + shiftY);
 			float fDistance1stClosest = 100;

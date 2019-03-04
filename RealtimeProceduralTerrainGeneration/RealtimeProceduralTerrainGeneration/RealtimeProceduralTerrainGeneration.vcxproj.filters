@@ -313,5 +313,11 @@
     <Image Include="..\Textures\T_Ground_Road_Path\T_Ground_Road_Path_3_N_H.png">
       <Filter>Resource Files\Textures\Road</Filter>
     </Image>
+    <Image Include="..\..\Doc\example1.png">
+      <Filter>Resource Files\Doc</Filter>
+    </Image>
+    <Image Include="..\..\Doc\example2.png">
+      <Filter>Resource Files\Doc</Filter>
+    </Image>
   </ItemGroup>
 </Project>

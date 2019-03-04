@@ -54,8 +54,8 @@ float noise(float x, float y, float z)
 
 void main(void)
 {
-	float shiftX = 20.0f*noise(gl_GlobalInvocationID.x / fWidth * 20, gl_GlobalInvocationID.y / fWidth * 20, 0);
-	float shiftY = 20.0f*noise(gl_GlobalInvocationID.x / fWidth * 20, gl_GlobalInvocationID.y / fWidth * 20, 10);
+	float shiftX = fWidth / 10.0f * noise(gl_GlobalInvocationID.x / fWidth * 20, gl_GlobalInvocationID.y / fWidth * 20, 0);
+	float shiftY = fWidth / 10.0f * noise(gl_GlobalInvocationID.x / fWidth * 20, gl_GlobalInvocationID.y / fWidth * 20, 10);
 
 	ivec2 position = ivec2(gl_GlobalInvocationID.xy+vec2(shiftX,shiftY));
 
