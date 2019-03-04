@@ -29,8 +29,6 @@ void main(void)
 
 	fHeight = mod(random[int(mod(position.x * position.y, randomCount))], 100) / 2000.0f + fHeight;
 
-	//find out which textureGroup should be used
-
 	int materialCount[8];
 	materialCount[0] = 4; //gras
 	materialCount[1] = 4; //leaves
