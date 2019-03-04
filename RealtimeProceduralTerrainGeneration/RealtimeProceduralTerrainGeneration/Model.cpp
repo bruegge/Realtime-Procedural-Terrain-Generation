@@ -35,6 +35,11 @@ void CModel::EnableTessellation(float fEnable)
 	m_fEnableTessellation = fEnable;
 }
 
+void CModel::EnableNormalMapping(float fEnable)
+{
+	m_fEnableNormalMapping = fEnable;
+}
+
 void CModel::EnableBezierSurface(float fEnable)
 {
 	m_fEnableBezierSurface = fEnable;
@@ -150,6 +155,7 @@ void CModel::draw(CShader* pShader, CCamera* pCamera)
 	GLint uniformLocationTerrainTextureWidth = glGetUniformLocation(pShader->getID(), "fTextureWidth");
 	GLint uniformLocationEnableTessellation = glGetUniformLocation(pShader->getID(), "fEnableTessellation");
 	GLint uniformLocationEnableBezier = glGetUniformLocation(pShader->getID(), "fEnableBezierSurface");
+	GLint uniformLocationEnableNormalMapping = glGetUniformLocation(pShader->getID(), "fEnableNormalMapping");
 	GLint uniformLocationRandomCount = glGetUniformLocation(pShader->getID(), "randomCount");
 	GLint uniformLocationRandomVector = glGetUniformLocation(pShader->getID(), "random");
 	GLint uniformLocationMaterialCount = glGetUniformLocation(pShader->getID(), "numberMaterials");
@@ -160,6 +166,7 @@ void CModel::draw(CShader* pShader, CCamera* pCamera)
 	glUniform1i(uniformLocationRandomCount, 1000);
 	glUniform1fv(uniformLocationRandomVector, 1000, m_vecRandomNumbers);
 	glUniform1f(uniformLocationEnableTessellation, m_fEnableTessellation);
+	glUniform1f(uniformLocationEnableNormalMapping, m_fEnableNormalMapping);
 	glUniform1f(uniformLocationEnableBezier, m_fEnableBezierSurface);
 	glUniform1f(uniformLocationTerrainGridWidth, m_nTerrainGridWidth - 1);
 	glUniform1f(uniformLocationTerrainTextureWidth, m_nTerrainTextureWidth);

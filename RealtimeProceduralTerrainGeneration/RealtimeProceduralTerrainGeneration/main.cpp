@@ -64,6 +64,9 @@ void loadContent() //load all objects and fill them
 	pTerrain->AddKeyBinding(GLFW_KEY_O, std::bind(&CModel::EnableTessellation, pTerrain, 0));
 	pTerrain->AddKeyBinding(GLFW_KEY_0, std::bind(&CModel::EnableBezierSurface, pTerrain, 1));
 	pTerrain->AddKeyBinding(GLFW_KEY_P, std::bind(&CModel::EnableBezierSurface, pTerrain, 0));
+	pTerrain->AddKeyBinding(GLFW_KEY_N, std::bind(&CModel::EnableNormalMapping, pTerrain, 1));
+	pTerrain->AddKeyBinding(GLFW_KEY_M, std::bind(&CModel::EnableNormalMapping, pTerrain, 0));
+
 
 	std::cout << "Content loaded" << std::endl;
 }

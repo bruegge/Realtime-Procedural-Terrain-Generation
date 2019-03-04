@@ -190,7 +190,7 @@ std::vector<GLfloat>* CTerrainGenerator::GetDataHeight()
 
 void CTerrainGenerator::GenerateErosion(unsigned int nSteps)
 {
-	return;
+
 	float di[3][3];
 	float hi[3][3];
 	float c = 0.5f;

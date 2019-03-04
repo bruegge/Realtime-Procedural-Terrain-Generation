@@ -35,6 +35,7 @@ public:
 	void CreateCube(); //method to fill the VBO / IBO
 
 	void EnableTessellation(float bEnable);
+	void EnableNormalMapping(float fEnable);
 	void EnableBezierSurface(float bEnable);
 	void EnableWireFrame(float bEnable);
 
@@ -45,6 +46,7 @@ private:
 	float m_fEnableTessellation;
 	float m_fEnableBezierSurface;
 	float m_fEnableWireFrame;
+	float m_fEnableNormalMapping;
 	GLfloat m_vecRandomNumbers[1000];
 
 	GLuint m_nCountIBO = 0;

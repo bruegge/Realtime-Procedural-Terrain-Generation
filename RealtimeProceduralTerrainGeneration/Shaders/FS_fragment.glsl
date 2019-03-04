@@ -12,7 +12,8 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform vec3 diffuseAlbedo = vec3(1,1,1);
 uniform vec3 specularAlbedo = vec3(0.7,0.7,0.7);
-uniform float specularPower = 1.0f;
+uniform float specularPower = 10.0f;
+uniform float fEnableNormalMapping;
 
 out vec4 color;
 
@@ -71,7 +72,7 @@ vec3 Phong(vec3 normal, float specularTexture, vec3 color)
 	vec3 diffuse = max(dot(N,L), 0.0) * color;
 	vec3 specular = pow(max(dot(R,V), 0.0), specularPower) * color;
 
-	return diffuse /*+ specular*specularTexture*/;
+	return diffuse + specular*specularTexture;
 }
 
 vec3 NormalMapping(vec3 normal, vec3 normalFromTexture)
@@ -89,9 +90,9 @@ void main()
 	float specularTexture;
 	vec3 colorTexture;
 	CalculateColor(normalTexture, specularTexture, colorTexture);
-	normal = NormalMapping(normal,normalTexture);
-
-	//vec4 erosion = texture(textureTerrain2ndDerAcc, fs_in.vertexTextureCoordinates);
-	//color = vec4(erosion.ba*10,0,1);
+	if(fEnableNormalMapping != 0)
+	{
+		normal = NormalMapping(normal,normalTexture);
+	}
 	color = vec4(Phong(normal,specularTexture,colorTexture),1);
 }
