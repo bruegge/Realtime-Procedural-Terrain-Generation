@@ -18,6 +18,26 @@ CTerrainGenerator::CTerrainGenerator(unsigned int nWidth, unsigned int nGridWidt
 	m_pShaderVoronoi = CShader::createComputeShaderProgram("../shaders/CS_Voronoi.glsl");
 	m_pShaderErosion = CShader::createComputeShaderProgram("../shaders/CS_Erosion.glsl");
 	m_pShaderSetTextures = CShader::createComputeShaderProgram("../shaders/CS_SetTexturePositions.glsl");
+
+	//create textures
+	m_vecTextures[0]->SetTextureData(m_nWidth, m_nWidth, 1, nullptr, false);
+	m_vecTextures[1]->SetTextureData(m_nWidth, m_nWidth, 4, nullptr, false);
+	m_vecTextures[2]->SetTextureData(m_nWidth, m_nWidth, 4, nullptr, false);
+	m_vecTextures[3]->SetTextureData(m_nWidth, m_nWidth, 1, nullptr, false, false);
+
+	//generate noise Array
+	for (int i = 0; i < 256; i++) {
+		m_perm[i] = i;
+	}
+	//shuffle
+	for (int i = 0; i < 256; i++) {
+		int swap_idx = rand() % 256;
+		std::swap(m_perm[i], m_perm[swap_idx]);
+	}
+
+	for (int i = 256; i < 512; i++) {
+		m_perm[i] = m_perm[i - 256];
+	}
 }
 
 CTerrainGenerator::~CTerrainGenerator()
@@ -61,12 +81,6 @@ void CTerrainGenerator::GenerateHeightMapCPU(unsigned int nCountVoronoiPoints, u
 
 void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, unsigned int nErosionSteps)
 {
-	m_vecTextures[0]->SetTextureData(m_nWidth, m_nWidth, 1, nullptr, false);
-	m_vecTextures[1]->SetTextureData(m_nWidth, m_nWidth, 4, nullptr, false);
-	m_vecTextures[2]->SetTextureData(m_nWidth, m_nWidth, 4, nullptr, false);
-	m_vecTextures[3]->SetTextureData(m_nWidth, m_nWidth, 1, nullptr, false, false);
-
-
 	glBindImageTexture(0, m_vecTextures[0]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 	glBindImageTexture(1, m_vecTextures[1]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
 	glBindImageTexture(2, m_vecTextures[2]->GetTextureID(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
@@ -78,8 +92,10 @@ void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, u
 		vecRandomNumbers[i] = rand() % m_nWidth;
 	}
 	m_pShaderNoise->bind();
-	glDispatchCompute(m_nWidth, m_nWidth, 1);
 	glUniform1f(glGetUniformLocation(m_pShaderNoise->getID(), "fWidth"), m_nWidth);
+	glUniform1iv(glGetUniformLocation(m_pShaderNoise->getID(), "perm"), 512, m_perm);
+	glDispatchCompute(m_nWidth, m_nWidth, 1);
+	
 
 	m_pShaderVoronoi->bind();
 	glUniform1f(glGetUniformLocation(m_pShaderVoronoi->getID(), "fWidth"), m_nWidth);
@@ -87,6 +103,7 @@ void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, u
 	glUniform1f(nLocationRandomCount, nCountVoronoiPoints);
 	GLint nLocationRandomVector = glGetUniformLocation(m_pShaderVoronoi->getID(), "random");
 	glUniform1fv(nLocationRandomVector, 100, vecRandomNumbers);
+	glUniform1iv(glGetUniformLocation(m_pShaderVoronoi->getID(), "perm"), 512, m_perm);
 	glDispatchCompute(m_nWidth, m_nWidth, 1);
 	
 	m_pShaderErosion->bind();
@@ -171,58 +188,9 @@ std::vector<GLfloat>* CTerrainGenerator::GetDataHeight()
 	return &m_vecDataSetHeight;
 }
 
-void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
-{
-	std::vector<glm::vec2> vecRandomNumbers(nCount);
-	for (unsigned int i = 0; i< nCount; ++i)
-	{
-		vecRandomNumbers[i].x = rand() % m_nWidth;
-		vecRandomNumbers[i].y = rand() % m_nWidth;
-	}
-
-	float fDiagonal = sqrt(m_nWidth * m_nWidth + m_nWidth * m_nWidth) / 5.0f;
-
-	float fWidth = m_nWidth;
-
-	for (unsigned int x = 0; x < m_nWidth; ++x)
-	{
-		for (unsigned int y = 0; y < m_nWidth; ++y)
-		{
-			glm::vec2 position = glm::vec2(x, y);
-			float fDistance1stClosest = 100;
-			float fDistance2ndClosest = 100;
-
-			for each (glm::vec2 var in vecRandomNumbers)
-			{
-				float fDistance = glm::length(var - position) / fDiagonal;
-				
-				for (int i = -1; i < 2; ++i)
-				{
-					for (int j = -1; j < 2; ++j)
-					{
-						glm::vec2 difference = var + glm::vec2(i * fWidth, j * fWidth) - position;
-						float fDistanceCalculated = glm::length(difference) / fDiagonal;
-						fDistance = std::fmin(fDistance, fDistanceCalculated);
-					}
-				}
-
-				if (fDistance < fDistance1stClosest)
-				{
-					fDistance2ndClosest = fDistance1stClosest;
-					fDistance1stClosest = fDistance;
-				}
-				else if (fDistance < fDistance2ndClosest)
-				{
-					fDistance2ndClosest = fDistance;
-				}
-			}
-			m_vecDataSetHeight[(x*m_nWidth + y)] *= (-fDistance1stClosest +fDistance2ndClosest);
-		}
-	}
-}
-
 void CTerrainGenerator::GenerateErosion(unsigned int nSteps)
 {
+	return;
 	float di[3][3];
 	float hi[3][3];
 	float c = 0.5f;
@@ -413,7 +381,8 @@ double grad(int hash, double x, double y, double z) {
 		v = h < 4 ? y : h == 12 || h == 14 ? x : z;
 	return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
 }
-double noise(double x, double y, double z, int perm[]) {
+
+double CTerrainGenerator::noise(double x, double y, double z) {
 
 	int X = (int)floor(x) & 255;
 	int Y = (int)floor(y) & 255;
@@ -427,14 +396,14 @@ double noise(double x, double y, double z, int perm[]) {
 	double v = fade(y);
 	double w = fade(z);
 
-	int A = perm[X] + Y;
-	int AA = perm[A] + Z;
-	int AB = perm[A + 1] + Z;
-	int B = perm[X + 1] + Y;
-	int BA = perm[B] + Z;
-	int BB = perm[B + 1] + Z;
+	int A = m_perm[X] + Y;
+	int AA = m_perm[A] + Z;
+	int AB = m_perm[A + 1] + Z;
+	int B = m_perm[X + 1] + Y;
+	int BA = m_perm[B] + Z;
+	int BB = m_perm[B + 1] + Z;
 
-	double res = lerp(w, lerp(v, lerp(u, grad(perm[AA], x, y, z), grad(perm[BA], x - 1, y, z)), lerp(u, grad(perm[AB], x, y - 1, z), grad(perm[BB], x - 1, y - 1, z))), lerp(v, lerp(u, grad(perm[AA + 1], x, y, z - 1), grad(perm[BA + 1], x - 1, y, z - 1)), lerp(u, grad(perm[AB + 1], x, y - 1, z - 1), grad(perm[BB + 1], x - 1, y - 1, z - 1))));
+	double res = lerp(w, lerp(v, lerp(u, grad(m_perm[AA], x, y, z), grad(m_perm[BA], x - 1, y, z)), lerp(u, grad(m_perm[AB], x, y - 1, z), grad(m_perm[BB], x - 1, y - 1, z))), lerp(v, lerp(u, grad(m_perm[AA + 1], x, y, z - 1), grad(m_perm[BA + 1], x - 1, y, z - 1)), lerp(u, grad(m_perm[AB + 1], x, y - 1, z - 1), grad(m_perm[BB + 1], x - 1, y - 1, z - 1))));
 	return (res + 1.0) / 2.0;
 }
 
@@ -443,27 +412,72 @@ double noise(double x, double y, double z, int perm[]) {
 
 void CTerrainGenerator::GenerateNoise()
 {
-	int perm[512];
-	for (int i = 0; i < 256; i++) {
-		perm[i] = i;
-	}
-	//shuffle
-	for (int i = 0; i < 256; i++) {
-		int swap_idx = rand() % 256;
-		std::swap(perm[i], perm[swap_idx]);
-	}
-
-	for (int i = 256; i < 512; i++) {
-		perm[i] = perm[i - 256];
-	}
-
 	m_vecDataSetHeight.resize(m_nWidth*m_nWidth);
 	for (unsigned int x = 0; x < m_nWidth; ++x)
 	{
 		for (unsigned int y = 0; y < m_nWidth; ++y)
 		{
-			float height = 2*noise(x / float(m_nWidth) * 10, y / float(m_nWidth) * 10, 0, perm);
+			float height = 0;
+			for (int i = 1; i < 20; ++i)
+			{
+				height += 0.5f / i * noise(x / float(m_nWidth) * i* 5, y / float(m_nWidth) * i*5, 0);
+			}
 			m_vecDataSetHeight[x * m_nWidth + y] = height;
+		}
+	}
+}
+
+
+
+void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
+{
+	std::vector<glm::vec2> vecRandomNumbers(nCount);
+	for (unsigned int i = 0; i< nCount; ++i)
+	{
+		vecRandomNumbers[i].x = rand() % m_nWidth;
+		vecRandomNumbers[i].y = rand() % m_nWidth;
+	}
+
+	float fDiagonal = sqrt(m_nWidth * m_nWidth + m_nWidth * m_nWidth) / 5.0f;
+
+	float fWidth = m_nWidth;
+
+	for (unsigned int x = 0; x < m_nWidth; ++x)
+	{
+		for (unsigned int y = 0; y < m_nWidth; ++y)
+		{
+			float shiftX = 20.0f*noise(x / static_cast<float>(m_nWidth) * 20, y / static_cast<float>(m_nWidth) * 20, 0);
+			float shiftY = 20.0f*noise(x / static_cast<float>(m_nWidth) * 20, y / static_cast<float>(m_nWidth) * 20, 10);
+
+			glm::vec2 position = glm::vec2(x + shiftX, y + shiftY);
+			float fDistance1stClosest = 100;
+			float fDistance2ndClosest = 100;
+
+			for each (glm::vec2 var in vecRandomNumbers)
+			{
+				float fDistance = glm::length(var - position) / fDiagonal;
+
+				for (int i = -1; i < 2; ++i)
+				{
+					for (int j = -1; j < 2; ++j)
+					{
+						glm::vec2 difference = var + glm::vec2(i * fWidth, j * fWidth) - position;
+						float fDistanceCalculated = glm::length(difference) / fDiagonal;
+						fDistance = std::fmin(fDistance, fDistanceCalculated);
+					}
+				}
+
+				if (fDistance < fDistance1stClosest)
+				{
+					fDistance2ndClosest = fDistance1stClosest;
+					fDistance1stClosest = fDistance;
+				}
+				else if (fDistance < fDistance2ndClosest)
+				{
+					fDistance2ndClosest = fDistance;
+				}
+			}
+			m_vecDataSetHeight[(x*m_nWidth + y)] *= (-fDistance1stClosest + fDistance2ndClosest);
 		}
 	}
 }

@@ -6,19 +6,29 @@ uniform sampler2D textureTerrain2ndDerAcc;
 uniform sampler2DArray textureMaterialColorSpecular;
 uniform sampler2DArray textureMaterialNormalHeight;
 
+
+uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+uniform vec3 diffuseAlbedo = vec3(1,1,1);
+uniform vec3 specularAlbedo = vec3(0.7,0.7,0.7);
+uniform float specularPower = 1.0f;
+
 out vec4 color;
 
 in TES_OUT 
 {
     vec3 vertexPositionWS;
+	vec4 vertexPositionVS;
     vec2 vertexTextureCoordinates;
 	vec3 vertexNormal;
 	vec3 color;
 	vec2 patchTextureCoordinates;
 	flat int[4] materialNumber;
+	vec3 lightPosition;
 } fs_in;  
 
-vec4 CalculateColor()
+void CalculateColor(out vec3 vNormalOut, out float fSpecularOut, out vec3 vColorOut)
 {
 	float fFactor = 0.50f;
 	float fRadius0 = length(vec2(1,1)-fs_in.patchTextureCoordinates)*fFactor;
@@ -45,20 +55,43 @@ vec4 CalculateColor()
 	vec4 normalHeight = texture(textureMaterialNormalHeight, vec3(fs_in.patchTextureCoordinates,fs_in.materialNumber[textureNumber]),0);
 	vec4 colorSpecular = texture(textureMaterialColorSpecular, vec3(fs_in.patchTextureCoordinates,fs_in.materialNumber[textureNumber]),0);
 
-	normalHeight.xyz = normalize(normalHeight.xyz * 2.0f - 1.0f);
-	return colorSpecular; 
+	vNormalOut = normalize(normalHeight.xyz * 2.0f - 1.0f);
+	vColorOut = colorSpecular.rgb;
+	fSpecularOut = colorSpecular.a;
+}
+
+vec3 Phong(vec3 normal, float specularTexture, vec3 color)
+{
+	vec4 P = fs_in.vertexPositionVS;
+	vec3 N = normalize(mat3(viewMatrix * modelMatrix) * normal);
+	vec3 L = normalize(fs_in.lightPosition - P.xyz);
+	vec3 V = normalize(-P.xyz);
+
+	vec3 R = reflect(-L, N);
+	vec3 diffuse = max(dot(N,L), 0.0) * color;
+	vec3 specular = pow(max(dot(R,V), 0.0), specularPower) * color;
+
+	return diffuse /*+ specular*specularTexture*/;
+}
+
+vec3 NormalMapping(vec3 normal, vec3 normalFromTexture)
+{
+	vec3 tangent = normalize(cross(vec3(0,1,0),normalFromTexture)); 
+	vec3 bitangent = normalize(cross(normalFromTexture,tangent)); 
+	mat3 TBNMatrix = mat3(tangent, bitangent,normalFromTexture);
+	return TBNMatrix * normal;
 }
 
 void main()
 {	
-	//vec3 normal = texture(textureTerrainNormal, fs_in.vertexTextureCoordinates).xyz;
-	//vec2 secondDerivative = texture(textureTerrain2ndDerAcc, fs_in.vertexTextureCoordinates).zw;
-	//vec3 normal = fs_in.vertexNormal;
-	//normal = normalize(normal * 2.0 - 1.0);
-	color = CalculateColor();
-	//color = vec4(normal,1);
-	//color = vec4(abs(secondDerivative*10.0f),0,1);
-	//color = vec4(fs_in.color,1);
-	//color = vec4(0,1,1,1);
-	//color = vec4(fs_in.vertexPositionWS.z, fs_in.vertexPositionWS.z, fs_in.vertexPositionWS.z, 1);
+	vec3 normal = fs_in.vertexNormal;
+	vec3 normalTexture;
+	float specularTexture;
+	vec3 colorTexture;
+	CalculateColor(normalTexture, specularTexture, colorTexture);
+	normal = NormalMapping(normal,normalTexture);
+
+	//vec4 erosion = texture(textureTerrain2ndDerAcc, fs_in.vertexTextureCoordinates);
+	//color = vec4(erosion.ba*10,0,1);
+	color = vec4(Phong(normal,specularTexture,colorTexture),1);
 }

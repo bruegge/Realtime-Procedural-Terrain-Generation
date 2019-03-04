@@ -8,6 +8,7 @@ uniform mat4 projectionMatrix;
 uniform sampler2D textureTerrain;
 
 uniform float fEnableBezierSurface;
+uniform vec3 lightPosition = vec3(50,50,100);
 
 in TCS_OUT
 {
@@ -20,11 +21,13 @@ in TCS_OUT
 out TES_OUT 
 {
     vec3 vertexPositionWS;
+	vec4 vertexPositionVS;
 	vec2 vertexTextureCoordinates;
 	vec3 vertexNormal;
 	vec3 color;
 	vec2 patchTextureCoordinates;
 	flat int[4] materialNumber;
+	vec3 lightPosition;
 } tes_out;
 
 patch in vec4 bezierControlPoints[16];
@@ -106,5 +109,7 @@ void main()
 		tes_out.materialNumber[i] = materialNumber[i];
 	}
 	tes_out.patchTextureCoordinates = vec2(1,1)-gl_TessCoord.yx;
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(tes_out.vertexPositionWS,1);
+	tes_out.vertexPositionVS = projectionMatrix * viewMatrix * modelMatrix * vec4(tes_out.vertexPositionWS,1);
+	tes_out.lightPosition = (viewMatrix * modelMatrix * vec4(lightPosition,1)).xyz;
+	gl_Position = tes_out.vertexPositionVS;
 }	

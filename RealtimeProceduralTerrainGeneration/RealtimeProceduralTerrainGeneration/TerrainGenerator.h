@@ -25,7 +25,7 @@ public:
 	CTexture* GetTerrainTexture();
 
 private:
-	
+	double noise(double x, double y, double z);
 	void GenerateVoronoi(unsigned int nCount);
 	void GenerateErosion(unsigned int nSteps);
 	void GenerateErosion2(unsigned int nSteps);
@@ -36,7 +36,7 @@ private:
 	float GetTerrainHeight(unsigned int x, unsigned int y);
 	unsigned int m_nWidth;
 	unsigned int m_nGridWidth;
-
+	int m_perm[512];
 	std::vector<GLfloat> m_vecDataSetHeight;
 	std::vector<CTexture*> m_vecTextures;
 	CShader* m_pShaderNormalAnd2ndDerivative;
