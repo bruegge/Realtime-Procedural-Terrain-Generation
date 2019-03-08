@@ -399,15 +399,11 @@ double lerp(double t, double a, double b) {
 	return a + t * (b - a);
 }
 
-//perlin version to calculate the dot product of a randomly selected gradient vector and the 8 location vectors
-/*double grad(int hash, double x, double y, double z) {
-	int h = hash & 15;
-	// Convert lower 4 bits of hash into 12 gradient directions
-	double u = h < 8 ? x : y,
-		v = h < 4 ? y : h == 12 || h == 14 ? x : z;
-	return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
-}*/
-// more understandable version to calculate the dot product
+
+// pick a random vector from 
+//(1,1,0),(-1,1,0),(1,-1,0),(-1,-1,0),
+//(1,0,1),(-1,0,1),(1,0,-1),(-1,0,-1),
+//(0,1,1),(0,-1,1),(0,1,-1),(0,-1,-1)
 double grad(int hash, double x, double y, double z)
 {
     switch(hash & 0xF)
