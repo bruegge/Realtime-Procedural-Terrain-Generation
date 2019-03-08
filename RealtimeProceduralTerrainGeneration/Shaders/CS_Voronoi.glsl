@@ -59,8 +59,6 @@ void main(void)
 
 	ivec2 position = ivec2(gl_GlobalInvocationID.xy+vec2(shiftX,shiftY));
 
-	//ivec2 position = ivec2(gl_GlobalInvocationID.xy);
-	
 	float fDistance1stClosest = 100;
 	float fDistance2ndClosest = 100;
 

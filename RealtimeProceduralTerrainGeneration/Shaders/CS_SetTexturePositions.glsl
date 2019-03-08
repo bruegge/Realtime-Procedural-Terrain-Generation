@@ -47,7 +47,7 @@ void main(void)
 	}
 	else if(fHeight < 0.9f) //rocks
 	{
-		randomMaterial = PickTexture(0.4f, 0.9f, fHeight, 18, 23);
+		randomMaterial = PickTexture(0.4f, 0.9f, fHeight, 19, 23);
 	}
 	else //snow
 	{

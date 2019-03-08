@@ -55,7 +55,7 @@ void main(void)
 	ivec2 position = ivec2(gl_GlobalInvocationID.xy);
 	
 	float fHeight = 0;
-	for (int i = 1; i < 30; ++i)
+	for (int i = 1; i < 20; ++i)
 	{
 		fHeight += 0.5f / i * noise(position.x / fWidth * i * 5, position.y / fWidth * i * 5, 0);
 	}

@@ -13,10 +13,15 @@ void main(void)
 	
 	ivec2 pixelPosition = ivec2(gl_GlobalInvocationID.xy);
 	vec4 vPos = imageLoad(terrainHeight,pixelPosition);
-	vec4 vHeightX_1 = imageLoad(terrainHeight,pixelPosition + ivec2(-1,0));
-	vec4 vHeightX1 = imageLoad(terrainHeight,pixelPosition + ivec2(1,0));
-	vec4 vHeightY_1 = imageLoad(terrainHeight,pixelPosition + ivec2(0,-1));
-	vec4 vHeightY1 = imageLoad(terrainHeight,pixelPosition + ivec2(0,1));
+	ivec2 pixelPositionX_1 = ivec2(int(mod(pixelPosition.x -1 + fWidth, fWidth)),pixelPosition.y);
+	ivec2 pixelPositionX1 = ivec2(int(mod(pixelPosition.x +1, fWidth)),pixelPosition.y);
+	ivec2 pixelPositionY_1 = ivec2(pixelPosition.x, int(mod(pixelPosition.y - 1 + fWidth, fWidth)));
+	ivec2 pixelPositionY1 = ivec2(pixelPosition.x, int(mod(pixelPosition.y + 1 , fWidth)));
+	
+	vec4 vHeightX_1 = imageLoad(terrainHeight,pixelPositionX_1);
+	vec4 vHeightX1 = imageLoad(terrainHeight,pixelPositionX1);
+	vec4 vHeightY_1 = imageLoad(terrainHeight,pixelPositionY_1);
+	vec4 vHeightY1 = imageLoad(terrainHeight,pixelPositionY1);
 	
 	//calculate normals
 	float fZInXDir = (vHeightX1.x - vHeightX_1.x);
@@ -27,9 +32,7 @@ void main(void)
 	vec3 vNormal = normalize(cross(vXDir, vYDir));
 
 
-
-
-
+	//2nd derivative
 	imageStore(terrainNormal,pixelPosition,vec4(vNormal.x,vNormal.y,vNormal.z,0));
 
 	//calculate 2nd derivative

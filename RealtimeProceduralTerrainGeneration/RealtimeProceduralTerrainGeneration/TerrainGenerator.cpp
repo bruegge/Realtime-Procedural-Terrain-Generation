@@ -1,3 +1,5 @@
+#include <time.h> 
+#include <chrono>
 #include "TerrainGenerator.h"
 #include <iostream>
 
@@ -73,10 +75,11 @@ void CTerrainGenerator::GenerateHeightMapCPU(unsigned int nCountVoronoiPoints, u
 {
 	GenerateNoise();
 	GenerateVoronoi(nCountVoronoiPoints);
-	GenerateErosion(nErosionSteps);
+	//GenerateErosion(nErosionSteps);
 	ApplyChangesToTextures();
 	GenerateDerivatives();
 	GenerateTextureDistribution();
+	std::cout << std::endl;
 }
 
 void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, unsigned int nErosionSteps)
@@ -94,9 +97,15 @@ void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, u
 	m_pShaderNoise->bind();
 	glUniform1f(glGetUniformLocation(m_pShaderNoise->getID(), "fWidth"), m_nWidth);
 	glUniform1iv(glGetUniformLocation(m_pShaderNoise->getID(), "perm"), 512, m_perm);
-	glDispatchCompute(m_nWidth, m_nWidth, 1);
-	
 
+	auto start = std::chrono::steady_clock::now();
+	glDispatchCompute(m_nWidth, m_nWidth, 1);
+	auto end = std::chrono::steady_clock::now();
+	std::chrono::duration<double> diff = end - start;
+	start = std::chrono::steady_clock::now();
+	double dTimeDiff = diff.count();
+	std::cout << "Generate Noise on GPU:" << dTimeDiff << " s" << std::endl;
+	
 	m_pShaderVoronoi->bind();
 	glUniform1f(glGetUniformLocation(m_pShaderVoronoi->getID(), "fWidth"), m_nWidth);
 	GLint nLocationRandomCount = glGetUniformLocation(m_pShaderVoronoi->getID(), "randomCount");
@@ -104,11 +113,27 @@ void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, u
 	GLint nLocationRandomVector = glGetUniformLocation(m_pShaderVoronoi->getID(), "random");
 	glUniform1fv(nLocationRandomVector, 100, vecRandomNumbers);
 	glUniform1iv(glGetUniformLocation(m_pShaderVoronoi->getID(), "perm"), 512, m_perm);
-	glDispatchCompute(m_nWidth, m_nWidth, 1);
 	
+	start = std::chrono::steady_clock::now();
+	glDispatchCompute(m_nWidth, m_nWidth, 1);
+	end = std::chrono::steady_clock::now();
+	diff = end - start;
+	start = std::chrono::steady_clock::now();
+	dTimeDiff = diff.count();
+	std::cout << "Generate Voronoi on GPU:" << dTimeDiff << " s" << std::endl;
+
 	m_pShaderErosion->bind();
 	glUniform1f(glGetUniformLocation(m_pShaderErosion->getID(), "fWidth"), m_nWidth);
+	
+	start = std::chrono::steady_clock::now();
 	glDispatchCompute(m_nWidth, m_nWidth, 1);
+	end = std::chrono::steady_clock::now();
+	diff = end - start;
+	start = std::chrono::steady_clock::now();
+	dTimeDiff = diff.count();
+	std::cout << "Generate Erosion (nor working now) on GPU:" << dTimeDiff << " s" << std::endl;
+
+	std::cout << std::endl;
 
 	GenerateDerivatives();
 
@@ -375,14 +400,14 @@ double lerp(double t, double a, double b) {
 }
 
 //perlin version to calculate the dot product of a randomly selected gradient vector and the 8 location vectors
-double grad(int hash, double x, double y, double z) {
+/*double grad(int hash, double x, double y, double z) {
 	int h = hash & 15;
 	// Convert lower 4 bits of hash into 12 gradient directions
 	double u = h < 8 ? x : y,
 		v = h < 4 ? y : h == 12 || h == 14 ? x : z;
 	return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
-}
-/* more understandable version to calculate the dot product
+}*/
+// more understandable version to calculate the dot product
 double grad(int hash, double x, double y, double z)
 {
     switch(hash & 0xF)
@@ -406,7 +431,7 @@ double grad(int hash, double x, double y, double z)
         default: return 0; // never happens
     }
 }
-*/
+
 
 double CTerrainGenerator::noise(double x, double y, double z) {
 
@@ -433,11 +458,10 @@ double CTerrainGenerator::noise(double x, double y, double z) {
 	return (res + 1.0) / 2.0;
 }
 
-
-
-
 void CTerrainGenerator::GenerateNoise()
 {
+	auto start = std::chrono::steady_clock::now();
+
 	m_vecDataSetHeight.resize(m_nWidth*m_nWidth);
 	for (unsigned int x = 0; x < m_nWidth; ++x)
 	{
@@ -451,12 +475,21 @@ void CTerrainGenerator::GenerateNoise()
 			m_vecDataSetHeight[x * m_nWidth + y] = height;
 		}
 	}
+
+	auto end = std::chrono::steady_clock::now();
+	std::chrono::duration<double> diff = end - start;
+	start = std::chrono::steady_clock::now();
+	double dTimeDiff = diff.count();
+	std::cout << "Generate Noise on CPU:" << dTimeDiff << " s" << std::endl;
+
 }
 
 
 
 void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
 {
+	auto start = std::chrono::steady_clock::now();
+
 	std::vector<glm::vec2> vecRandomNumbers(nCount);
 	for (unsigned int i = 0; i< nCount; ++i)
 	{
@@ -506,6 +539,12 @@ void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
 			m_vecDataSetHeight[(x*m_nWidth + y)] *= (-fDistance1stClosest + fDistance2ndClosest);
 		}
 	}
+
+	auto end = std::chrono::steady_clock::now();
+	std::chrono::duration<double> diff = end - start;
+	start = std::chrono::steady_clock::now();
+	double dTimeDiff = diff.count();
+	std::cout << "Generate Voronoi on CPU:" << dTimeDiff << " s" << std::endl;
 }
 
 void CTerrainGenerator::GenerateDerivatives()

@@ -95,4 +95,6 @@ void main()
 		normal = NormalMapping(normal,normalTexture);
 	}
 	color = vec4(Phong(normal,specularTexture,colorTexture),1);
+//	color = vec4(texture(textureTerrain, fs_in.vertexTextureCoordinates).x,texture(textureTerrain, fs_in.vertexTextureCoordinates).x,texture(textureTerrain, fs_in.vertexTextureCoordinates).x,1);
+//	color = vec4(normal,1);
 }
