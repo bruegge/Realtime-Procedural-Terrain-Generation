@@ -391,10 +391,12 @@ float CTerrainGenerator::GetTerrainHeight(unsigned int x, unsigned int y)
 	return m_vecDataSetHeight[(x*m_nWidth + y)];
 }
 
+//fade function (ease curve) to avoid linear interpolation
 double fade(double t) {
 	return t * t * t * (t * (t * 6 - 15) + 10);
 }
 
+//linear interpolation function
 double lerp(double t, double a, double b) {
 	return a + t * (b - a);
 }
@@ -443,6 +445,7 @@ double CTerrainGenerator::noise(double x, double y, double z) {
 	double v = fade(y);
 	double w = fade(z);
 
+	//hash function to pick gradient vector
 	int A = m_perm[X] + Y;
 	int AA = m_perm[A] + Z;
 	int AB = m_perm[A + 1] + Z;
@@ -501,6 +504,7 @@ void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
 	{
 		for (unsigned int y = 0; y < m_nWidth; ++y)
 		{
+			// m_nWidth / 10.0f : shifting amplitude, 20 : shifting frequency
 			float shiftX = m_nWidth / 10.0f * noise(x / static_cast<float>(m_nWidth) * 20, y / static_cast<float>(m_nWidth) * 20, 0);
 			float shiftY = m_nWidth / 10.0f * noise(x / static_cast<float>(m_nWidth) * 20, y / static_cast<float>(m_nWidth) * 20, 10);
 
