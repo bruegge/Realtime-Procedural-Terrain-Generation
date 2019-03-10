@@ -471,6 +471,23 @@ void CTerrainGenerator::GenerateNoise()
 			{
 				height += 0.5f / i * noise(x / float(m_nWidth) * i* 5, y / float(m_nWidth) * i*5, 0);
 			}
+			/*
+			int octaves = 6;
+			int persistence = 2;
+			int frequency = 1;
+    			int amplitude = 1;
+    			float maxValue = 0;
+			for(int i=0;i<octaves;i++) 
+			{
+				height += noise(x * frequency, y * frequency, z * frequency) * amplitude;
+
+				maxValue += amplitude;
+
+				amplitude *= persistence;
+				frequency *= 2;
+			 }
+			 height = total/maxValue;
+			 */
 			m_vecDataSetHeight[x * m_nWidth + y] = height;
 		}
 	}
