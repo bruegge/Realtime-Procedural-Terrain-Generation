@@ -402,6 +402,49 @@ double lerp(double t, double a, double b) {
 }
 
 
+/*
+double grad(int hash, double x, double y)
+{
+    switch(hash & 0x6)
+    {
+        case 0x0: return  x + y;
+        case 0x1: return -x + y;
+        case 0x2: return  x - y;
+        case 0x3: return -x - y;
+        case 0x4: return  y + x;
+        case 0x5: return  y - x;
+        default: return 0; // never happens
+    }
+}
+
+
+double CTerrainGenerator::noise(double x, double y) {
+
+	int X = (int)floor(x) & 255;
+	int Y = (int)floor(y) & 255;
+
+	x -= floor(x);
+	y -= floor(y);
+
+	double u = fade(x);
+	double v = fade(y);
+
+    	int g1 = m_perm[m_perm[m_perm[X]+ Y ]];
+    	int g2 = m_perm[m_perm[m_perm[X]+ Y + 1]];
+    	int g3 = m_perm[m_perm[m_perm[X+1]+ Y + 1]];
+    	int g4 = m_perm[m_perm[m_perm[X+1]+ Y]];
+
+
+
+	int x1 = lerp(g1,g2,u);
+	int x2 = lerp(g3,g4,u);
+
+	int average = lerp(x1,x2,v);
+
+	return (average + 1.0) / 2.0;
+}
+*/
+
 // pick a random vector from 
 //(1,1,0),(-1,1,0),(1,-1,0),(-1,-1,0),
 //(1,0,1),(-1,0,1),(1,0,-1),(-1,0,-1),
