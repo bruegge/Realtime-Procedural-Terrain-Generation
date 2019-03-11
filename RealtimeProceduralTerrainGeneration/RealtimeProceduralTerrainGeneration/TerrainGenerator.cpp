@@ -391,23 +391,64 @@ float CTerrainGenerator::GetTerrainHeight(unsigned int x, unsigned int y)
 	return m_vecDataSetHeight[(x*m_nWidth + y)];
 }
 
+//fade function (ease curve) to avoid linear interpolation
 double fade(double t) {
 	return t * t * t * (t * (t * 6 - 15) + 10);
 }
 
+//linear interpolation function
 double lerp(double t, double a, double b) {
 	return a + t * (b - a);
 }
 
-//perlin version to calculate the dot product of a randomly selected gradient vector and the 8 location vectors
-/*double grad(int hash, double x, double y, double z) {
-	int h = hash & 15;
-	// Convert lower 4 bits of hash into 12 gradient directions
-	double u = h < 8 ? x : y,
-		v = h < 4 ? y : h == 12 || h == 14 ? x : z;
-	return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
-}*/
-// more understandable version to calculate the dot product
+
+/*
+double grad(int hash, double x, double y)
+{
+    switch(hash & 0x6)
+    {
+        case 0x0: return  x + y;
+        case 0x1: return -x + y;
+        case 0x2: return  x - y;
+        case 0x3: return -x - y;
+        case 0x4: return  y + x;
+        case 0x5: return  y - x;
+        default: return 0; // never happens
+    }
+}
+
+
+double CTerrainGenerator::noise(double x, double y) {
+
+	int X = (int)floor(x) & 255;
+	int Y = (int)floor(y) & 255;
+
+	x -= floor(x);
+	y -= floor(y);
+
+	double u = fade(x);
+	double v = fade(y);
+
+    	int g1 = m_perm[m_perm[m_perm[X]+ Y ]];
+    	int g2 = m_perm[m_perm[m_perm[X]+ Y + 1]];
+    	int g3 = m_perm[m_perm[m_perm[X+1]+ Y + 1]];
+    	int g4 = m_perm[m_perm[m_perm[X+1]+ Y]];
+
+
+
+	int x1 = lerp(g1,g2,u);
+	int x2 = lerp(g3,g4,u);
+
+	int average = lerp(x1,x2,v);
+
+	return (average + 1.0) / 2.0;
+}
+*/
+
+// pick a random vector from 
+//(1,1,0),(-1,1,0),(1,-1,0),(-1,-1,0),
+//(1,0,1),(-1,0,1),(1,0,-1),(-1,0,-1),
+//(0,1,1),(0,-1,1),(0,1,-1),(0,-1,-1)
 double grad(int hash, double x, double y, double z)
 {
     switch(hash & 0xF)
@@ -447,6 +488,7 @@ double CTerrainGenerator::noise(double x, double y, double z) {
 	double v = fade(y);
 	double w = fade(z);
 
+	//hash function to pick gradient vector
 	int A = m_perm[X] + Y;
 	int AA = m_perm[A] + Z;
 	int AB = m_perm[A + 1] + Z;
@@ -472,6 +514,23 @@ void CTerrainGenerator::GenerateNoise()
 			{
 				height += 0.5f / i * noise(x / float(m_nWidth) * i* 5, y / float(m_nWidth) * i*5, 0);
 			}
+			/*
+			int octaves = 6;
+			int persistence = 2;
+			int frequency = 1;
+    			int amplitude = 1;
+    			float maxValue = 0;
+			for(int i=0;i<octaves;i++) 
+			{
+				height += noise(x * frequency, y * frequency, z * frequency) * amplitude;
+
+				maxValue += amplitude;
+
+				amplitude *= persistence;
+				frequency *= 2;
+			 }
+			 height = total/maxValue;
+			 */
 			m_vecDataSetHeight[x * m_nWidth + y] = height;
 		}
 	}
@@ -505,6 +564,7 @@ void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
 	{
 		for (unsigned int y = 0; y < m_nWidth; ++y)
 		{
+			// m_nWidth / 10.0f : shifting amplitude, 20 : shifting frequency
 			float shiftX = m_nWidth / 10.0f * noise(x / static_cast<float>(m_nWidth) * 20, y / static_cast<float>(m_nWidth) * 20, 0);
 			float shiftY = m_nWidth / 10.0f * noise(x / static_cast<float>(m_nWidth) * 20, y / static_cast<float>(m_nWidth) * 20, 10);
 
