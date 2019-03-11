@@ -86,8 +86,7 @@ float CalculateBezierSurfaceHeight()
 		}
 	}
 	
-	return fHeight;
-	
+	return fHeight;	
 }
 
 void main()

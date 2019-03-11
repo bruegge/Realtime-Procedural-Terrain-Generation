@@ -74,7 +74,7 @@ glm::vec3 CCamera::GetPosition() const
 
 void CCamera::TurnX(double dDeltaX)
 {
-	glm::mat4 rotationMatrix = glm::rotate(static_cast<float>(-dDeltaX/180.0f), glm::vec3(0, 0, 1));
+	glm::mat4 rotationMatrix = glm::rotate(static_cast<float>(-dDeltaX/180.0f*0.2f), glm::vec3(0, 0, 1));
 	m_ViewMatrix = m_ViewMatrix * rotationMatrix;
 }
 
@@ -86,7 +86,7 @@ void CCamera::TurnY(double dDeltaY)
 	glm::vec3 front = transposed[2];
 	glm::vec3 position = GetPosition();
 	float fDistanceToCenter = sqrt(position.x*position.x + position.y*position.y + position.z*position.z);
-	position -= up * static_cast<float>(dDeltaY) * fDistanceToCenter * 0.01f;
+	position -= up * static_cast<float>(dDeltaY*0.2f) * fDistanceToCenter * 0.01f;
 	position = glm::normalize(position)* fDistanceToCenter;
 	if (position.z > 0.0f && (up.z > 0.0f || dDeltaY > 0))
 	{
@@ -100,7 +100,7 @@ void CCamera::Forward(double dDeltaTime)
 	float fDistanceToCenter = sqrt(position.x*position.x + position.y*position.y + position.z*position.z);
 	if (fDistanceToCenter > 1.0f)
 	{
-		Translate(glm::vec3(0, 0, 4.0f * dDeltaTime));
+		Translate(glm::vec3(0, 0, 4.0f * dDeltaTime*0.2f));
 	}
 }
 
@@ -110,6 +110,6 @@ void CCamera::Backward(double dDeltaTime)
 	float fDistanceToCenter = sqrt(position.x*position.x + position.y*position.y + position.z*position.z);
 	if (fDistanceToCenter < 10.0f)
 	{
-		Translate(glm::vec3(0, 0, -4.0f * dDeltaTime));
+		Translate(glm::vec3(0, 0, -4.0f * dDeltaTime*0.2f));
 	}
 }

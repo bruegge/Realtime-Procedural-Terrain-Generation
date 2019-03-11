@@ -107,7 +107,7 @@ float CalculateTessellation()
 	float tess2 = max(1, abs(p3.y - p1.y) * tessFactor);
 	float tess1 = max(1, abs(p0.x - p1.x) * tessFactor);
 	float tess3 = max(1, abs(p2.x - p3.x) * tessFactor);
-	float tessDiagonal = 1;
+	
 	gl_TessLevelOuter[0] = tess0;
 	gl_TessLevelOuter[1] = tess1;
 	gl_TessLevelOuter[2] = tess2;

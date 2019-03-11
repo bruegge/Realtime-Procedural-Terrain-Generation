@@ -28,7 +28,6 @@ void main(void)
 	float fZInYDir = (vHeightY1.x - vHeightY_1.x);
 	vec3 vXDir = vec3(fPixelDistance, 0, fZInXDir);
 	vec3 vYDir = vec3(0, fPixelDistance, fZInYDir);
-
 	vec3 vNormal = normalize(cross(vXDir, vYDir));
 
 

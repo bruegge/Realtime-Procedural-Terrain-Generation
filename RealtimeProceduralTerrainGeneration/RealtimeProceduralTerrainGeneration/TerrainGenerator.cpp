@@ -104,7 +104,7 @@ void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, u
 	std::chrono::duration<double> diff = end - start;
 	start = std::chrono::steady_clock::now();
 	double dTimeDiff = diff.count();
-	std::cout << "Generate Noise on GPU:" << dTimeDiff << " s" << std::endl;
+	std::cout << "Generate Noise on GPU:" << dTimeDiff * 1000 << " ms" << std::endl;
 	
 	m_pShaderVoronoi->bind();
 	glUniform1f(glGetUniformLocation(m_pShaderVoronoi->getID(), "fWidth"), m_nWidth);
@@ -120,7 +120,7 @@ void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, u
 	diff = end - start;
 	start = std::chrono::steady_clock::now();
 	dTimeDiff = diff.count();
-	std::cout << "Generate Voronoi on GPU:" << dTimeDiff << " s" << std::endl;
+	std::cout << "Generate Voronoi on GPU:" << dTimeDiff * 1000 << " ms" << std::endl;
 
 	m_pShaderErosion->bind();
 	glUniform1f(glGetUniformLocation(m_pShaderErosion->getID(), "fWidth"), m_nWidth);
@@ -131,7 +131,7 @@ void CTerrainGenerator::GenerateHeightMapGPU(unsigned int nCountVoronoiPoints, u
 	diff = end - start;
 	start = std::chrono::steady_clock::now();
 	dTimeDiff = diff.count();
-	std::cout << "Generate Erosion (nor working now) on GPU:" << dTimeDiff << " s" << std::endl;
+	std::cout << "Generate Erosion (nor working now) on GPU:" << dTimeDiff * 1000 << " ms" << std::endl;
 
 	std::cout << std::endl;
 
@@ -480,7 +480,7 @@ void CTerrainGenerator::GenerateNoise()
 	std::chrono::duration<double> diff = end - start;
 	start = std::chrono::steady_clock::now();
 	double dTimeDiff = diff.count();
-	std::cout << "Generate Noise on CPU:" << dTimeDiff << " s" << std::endl;
+	std::cout << "Generate Noise on CPU:" << dTimeDiff * 1000 << " ms" << std::endl;
 
 }
 
@@ -544,7 +544,7 @@ void CTerrainGenerator::GenerateVoronoi(unsigned int nCount)
 	std::chrono::duration<double> diff = end - start;
 	start = std::chrono::steady_clock::now();
 	double dTimeDiff = diff.count();
-	std::cout << "Generate Voronoi on CPU:" << dTimeDiff << " s" << std::endl;
+	std::cout << "Generate Voronoi on CPU:" << dTimeDiff * 1000 << " ms" << std::endl;
 }
 
 void CTerrainGenerator::GenerateDerivatives()
