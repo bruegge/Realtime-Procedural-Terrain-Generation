@@ -46,6 +46,9 @@
     <Filter Include="Resource Files\Textures\Snow">
       <UniqueIdentifier>{90615e00-0184-48ea-95b8-55748795d74d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\imGUI">
+      <UniqueIdentifier>{8bad5677-6a59-498a-b1f1-7f42f36af45b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -78,6 +81,24 @@
     <ClCompile Include="TerrainGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\ExternalLibs\ImGUI\imgui.cpp">
+      <Filter>Source Files\imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExternalLibs\ImGUI\imgui_demo.cpp">
+      <Filter>Source Files\imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExternalLibs\ImGUI\imgui_draw.cpp">
+      <Filter>Source Files\imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExternalLibs\ImGUI\imgui_impl_glfw.cpp">
+      <Filter>Source Files\imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExternalLibs\ImGUI\imgui_impl_opengl3.cpp">
+      <Filter>Source Files\imGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExternalLibs\ImGUI\imgui_widgets.cpp">
+      <Filter>Source Files\imGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -103,6 +124,30 @@
     </ClInclude>
     <ClInclude Include="TerrainGenerator.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibs\ImGUI\imconfig.h">
+      <Filter>Source Files\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibs\ImGUI\imgui.h">
+      <Filter>Source Files\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibs\ImGUI\imgui_impl_glfw.h">
+      <Filter>Source Files\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibs\ImGUI\imgui_impl_opengl3.h">
+      <Filter>Source Files\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibs\ImGUI\imgui_internal.h">
+      <Filter>Source Files\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibs\ImGUI\imstb_rectpack.h">
+      <Filter>Source Files\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibs\ImGUI\imstb_textedit.h">
+      <Filter>Source Files\imGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExternalLibs\ImGUI\imstb_truetype.h">
+      <Filter>Source Files\imGUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

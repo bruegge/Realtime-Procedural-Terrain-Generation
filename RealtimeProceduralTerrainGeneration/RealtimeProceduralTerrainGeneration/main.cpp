@@ -13,6 +13,9 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "TerrainGenerator.h"
+#include "../ImGUI/imgui.h"
+#include "../ImGUI/imgui_impl_glfw.h"
+#include "../ImGUI/imgui_impl_opengl3.h"
 
 int windowWidth = 800;
 int windowHeight = 600;
@@ -45,8 +48,6 @@ void loadContent() //load all objects and fill them
 											nullptr, 
 											"../shaders/FS_fragment.glsl");
 	//create and load texture
-
-
 	pTextureMaterial = new CTexture();	
 	pTextureMaterial->LoadMaterials();
 
@@ -58,15 +59,14 @@ void loadContent() //load all objects and fill them
 	pCamera->AddKeyBinding(GLFW_KEY_S, std::bind(&CCamera::Backward, pCamera, std::placeholders::_1));
 	pCamera->AddKeyBinding(GLFW_KEY_A, std::bind(&CCamera::TurnX, pCamera, -1));
 	pCamera->AddKeyBinding(GLFW_KEY_D, std::bind(&CCamera::TurnX, pCamera, 1));
-	pTerrain->AddKeyBinding(GLFW_KEY_1, std::bind(&CModel::EnableWireFrame, pTerrain, 1));
-	pTerrain->AddKeyBinding(GLFW_KEY_2, std::bind(&CModel::EnableWireFrame, pTerrain, 0));
-	pTerrain->AddKeyBinding(GLFW_KEY_9, std::bind(&CModel::EnableTessellation, pTerrain, 1));
-	pTerrain->AddKeyBinding(GLFW_KEY_O, std::bind(&CModel::EnableTessellation, pTerrain, 0));
-	pTerrain->AddKeyBinding(GLFW_KEY_0, std::bind(&CModel::EnableBezierSurface, pTerrain, 1));
-	pTerrain->AddKeyBinding(GLFW_KEY_P, std::bind(&CModel::EnableBezierSurface, pTerrain, 0));
-	pTerrain->AddKeyBinding(GLFW_KEY_N, std::bind(&CModel::EnableNormalMapping, pTerrain, 1));
-	pTerrain->AddKeyBinding(GLFW_KEY_M, std::bind(&CModel::EnableNormalMapping, pTerrain, 0));
-
+	
+	{ //GUI
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		ImGui::StyleColorsDark();
+		ImGui_ImplGlfw_InitForOpenGL(pWindow->getWindowPointer(), true);
+		ImGui_ImplOpenGL3_Init("#version 430");
+	}
 
 	std::cout << "Content loaded" << std::endl;
 }
@@ -86,18 +86,6 @@ void programLoop(CGLFWWindow* window)
 
 		bClose = window->IO(); //check key inputs
 		
-		//check to change terrain
-		if (glfwGetKey(window->getWindowPointer(), GLFW_KEY_3) == GLFW_PRESS)
-		{
-			pTerrainGenerator->GenerateHeightMapCPU(7,50); 
-		}
-		if (glfwGetKey(window->getWindowPointer(), GLFW_KEY_4) == GLFW_PRESS)
-		{
-			pTerrainGenerator->GenerateHeightMapGPU(7, 50);
-		}
-		
-
-	
 		pShader->bind();
 		
 		pTerrainGenerator->GetHeightMap()->Link(pShader, 0, "textureTerrain");
@@ -113,8 +101,87 @@ void programLoop(CGLFWWindow* window)
 		pTextureMaterial->BindMaterial(4, 5);
 		
 		//draw terrain	
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+
 		pTerrain->draw(pShader, pCamera); //draws the triangle with the given shader
 	
+		{ //imGUI
+			ImGui::Begin("Settings");                          // Create a window called "Hello, world!" and append into it.
+			if (ImGui::Button("Generate new Terrain with GPU"))
+			{
+				pTerrainGenerator->GenerateHeightMapGPU(7, 50);
+			}
+			if (ImGui::Button("Generate new Terrain with CPU"))
+			{
+				pTerrainGenerator->GenerateHeightMapCPU(7, 50);
+			}
+		
+			bool bEnableWireframe = pTerrain->IsWireFrameEnabled();
+			ImGui::Checkbox("Enable WireFrames", &bEnableWireframe);      // Edit bools storing our window open/close state
+			if (bEnableWireframe != pTerrain->IsWireFrameEnabled())
+			{
+				pTerrain->EnableWireFrame(bEnableWireframe);
+			}
+			
+			bool bEnableNormalMapping = pTerrain->IsNormalMappingEnabled();
+			ImGui::Checkbox("Enable Normal mapping", &bEnableNormalMapping);      // Edit bools storing our window open/close state
+			if (bEnableNormalMapping != pTerrain->IsNormalMappingEnabled())
+			{
+				pTerrain->EnableNormalMapping(bEnableNormalMapping);
+			}
+		
+			bool bEnableTessellation = pTerrain->IsTessellationEnabled();
+			ImGui::Checkbox("Enable Tessellation", &bEnableTessellation);      // Edit bools storing our window open/close state
+			if (bEnableTessellation != pTerrain->IsTessellationEnabled())
+			{
+				pTerrain->EnableTessellation(bEnableTessellation);
+			}
+
+			bool bEnableBezier = pTerrain->IsBezierSurfaceEnabled();
+			ImGui::Checkbox("Enable Bezier surface", &bEnableBezier);      // Edit bools storing our window open/close state
+			if (bEnableBezier != pTerrain->IsBezierSurfaceEnabled())
+			{
+				pTerrain->EnableBezierSurface(bEnableBezier);
+			}
+			
+			/*ImGui::Text("Number instances: %i", pSettings->m_nInfoInstanceCount);               // Display some text (you can use a format strings too)
+			ImGui::Text("ComputeTime CPU: %f ms", pSettings->m_dComputeTimeCPU);               // Display some text (you can use a format strings too)
+			ImGui::Checkbox("Enable face culling", &(pSettings->m_bEnableCullFace));      // Edit bools storing our window open/close state
+			ImGui::Checkbox("Enable QuadTree update", &(pSettings->m_bEnableQuadTreeUpdate));      // Edit bools storing our window open/close state
+			ImGui::Checkbox("Enable TJunction elimination", &(pSettings->m_bEnableTJunctionElimination));      // Edit bools storing our window open/close state
+
+			int nRadioButtonValue;
+			ImGui::RadioButton("Number 1", &nRadioButtonValue, 1);
+			ImGui::RadioButton("Number 2", &nRadioButtonValue, 2);
+
+			float fGridSize = static_cast<float>(pSettings->m_nGeometrySize);
+			ImGui::SliderFloat("single grid size", &fGridSize, 2.0f, 33.0f);
+			pSettings->m_nGeometrySize = static_cast<unsigned int>(fGridSize);
+			pSettings->m_nGeometrySize += 1 - pSettings->m_nGeometrySize % 2;
+
+
+			float fMaxQuadTreeDepth = static_cast<float>(pSettings->m_nMaxQuadTreeDepth);
+			ImGui::SliderFloat("QuadTree Max Depth", &fMaxQuadTreeDepth, 0.0f, 20.0f);
+			pSettings->m_nMaxQuadTreeDepth = static_cast<unsigned int>(fMaxQuadTreeDepth);
+
+			ImGui::SliderFloat("QuadTree Division Angle", &pSettings->m_fTileDivisionAngle, 90.0f, 6.0f);
+
+			float fPerlinNoiseCount = static_cast<float>(pSettings->m_nPerlinNoiseCount);
+			ImGui::SliderFloat("Number iterations perlin noise", &fPerlinNoiseCount, 0.0f, 30.0f);
+			pSettings->m_nPerlinNoiseCount = static_cast<unsigned int>(fPerlinNoiseCount);
+
+			*/
+			//ImGui::Text("(%.1f FPS)", ImGui::GetIO().Framerate);
+			ImGui::End();
+	
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		}
+
+
 		//swaps the backbuffer with the frontbuffer to show the result
 		glfwSwapBuffers(window->getWindowPointer());
 
@@ -134,6 +201,8 @@ void deleteContent() //delete the objects
 	delete pShader;
 	delete pTextureMaterial;
 	delete pCamera;
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 }
 
 int main()

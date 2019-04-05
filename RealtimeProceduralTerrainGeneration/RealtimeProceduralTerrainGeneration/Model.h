@@ -38,6 +38,10 @@ public:
 	void EnableNormalMapping(float fEnable);
 	void EnableBezierSurface(float bEnable);
 	void EnableWireFrame(float bEnable);
+	bool IsWireFrameEnabled();
+	bool IsBezierSurfaceEnabled();
+	bool IsNormalMappingEnabled();
+	bool IsTessellationEnabled();
 
 private:
 
@@ -48,7 +52,8 @@ private:
 	float m_fEnableWireFrame;
 	float m_fEnableNormalMapping;
 	GLfloat m_vecRandomNumbers[1000];
-
+	bool m_bEnableWireFrame = false;
+	
 	GLuint m_nCountIBO = 0;
 	GLuint m_nVAO = 0;
 	GLuint m_nVBO = 0;

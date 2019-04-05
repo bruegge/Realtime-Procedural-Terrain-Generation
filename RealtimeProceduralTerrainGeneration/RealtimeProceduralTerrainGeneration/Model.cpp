@@ -45,12 +45,33 @@ void CModel::EnableBezierSurface(float fEnable)
 	m_fEnableBezierSurface = fEnable;
 }
 
+bool CModel::IsBezierSurfaceEnabled()
+{
+	return m_fEnableBezierSurface != 0;
+}
+
+bool CModel::IsNormalMappingEnabled()
+{
+	return m_fEnableNormalMapping != 0;
+}
+
+bool CModel::IsTessellationEnabled()
+{
+	return m_fEnableTessellation != 0;
+}
+
 void CModel::EnableWireFrame(float fEnable)
 {
 	if(fEnable)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	m_bEnableWireFrame = fEnable;
+}
+
+bool CModel::IsWireFrameEnabled()
+{
+	return m_bEnableWireFrame;
 }
 
 void CModel::SetVBOandIBOData(std::vector<SDataVBO>* pvVBO, std::vector<GLuint>* pvIBO)

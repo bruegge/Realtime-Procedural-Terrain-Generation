@@ -118,11 +118,6 @@ void CTexture::LoadSingleMaterialToTextureArray(const char* pMaterialFolderName,
 				GetOpenGLError(true);
 			}		
 		}
-		else
-		{
-			int muh = 0;
-			muh++;
-		}
 		stbi_image_free(pData);
 
 		//normal + Heightmap
@@ -136,11 +131,6 @@ void CTexture::LoadSingleMaterialToTextureArray(const char* pMaterialFolderName,
 				glBindTexture(GL_TEXTURE_2D_ARRAY, m_nMaterialNormalHeightID);
 				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, nMaterialNumber, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, pData);
 			}
-		}
-		else
-		{
-			int muh = 0;
-			muh++;
 		}
 		stbi_image_free(pData);
 	}

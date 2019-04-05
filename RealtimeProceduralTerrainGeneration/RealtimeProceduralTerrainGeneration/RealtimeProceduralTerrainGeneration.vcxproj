@@ -118,6 +118,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\ExternalLibs\ImGUI\imgui.cpp" />
+    <ClCompile Include="..\ExternalLibs\ImGUI\imgui_demo.cpp" />
+    <ClCompile Include="..\ExternalLibs\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="..\ExternalLibs\ImGUI\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\ExternalLibs\ImGUI\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\ExternalLibs\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="..\ExternalLibs\src\glad.c" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="GLFWWindow.cpp" />
@@ -130,6 +136,14 @@
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\ExternalLibs\ImGUI\imconfig.h" />
+    <ClInclude Include="..\ExternalLibs\ImGUI\imgui.h" />
+    <ClInclude Include="..\ExternalLibs\ImGUI\imgui_impl_glfw.h" />
+    <ClInclude Include="..\ExternalLibs\ImGUI\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\ExternalLibs\ImGUI\imgui_internal.h" />
+    <ClInclude Include="..\ExternalLibs\ImGUI\imstb_rectpack.h" />
+    <ClInclude Include="..\ExternalLibs\ImGUI\imstb_textedit.h" />
+    <ClInclude Include="..\ExternalLibs\ImGUI\imstb_truetype.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="GLFWWindow.h" />
     <ClInclude Include="ImageLoader.h" />
